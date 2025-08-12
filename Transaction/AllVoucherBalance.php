@@ -699,13 +699,14 @@ $MainContent .= '
             <thead>
                 <th>SL</th>
                 <th>Present Stock Value</th>
-                <th>Total Bank Cash Balance</th>
+                <td>' . $PresentStock . '</td>
+                
             </thead>
             <tbody>
 
             <tr>
                 <td> 1 </td>
-                <td>' . $PresentStock . '</td>
+                <th>Total Bank Cash Balance</th>
                 <td>' . $grandTotalCR . '</td>
             </tr>
 
