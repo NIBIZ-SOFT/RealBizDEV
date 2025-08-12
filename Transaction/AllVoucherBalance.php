@@ -669,7 +669,7 @@ foreach ($AllBankCash as $key => $BankCash) {
         <tr>
             <td>' . ($key + 1) . '</td>
             <td>' . $BankCash['AccountTitle'] . '</td>
-            <td>' . $totalCR . '</td>
+            <td>' . $netBalance . '</td>
         </tr>
     ';
 }
