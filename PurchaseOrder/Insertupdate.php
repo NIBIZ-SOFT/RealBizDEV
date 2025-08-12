@@ -4,6 +4,7 @@
 
 include "./script/{$_REQUEST["Base"]}/Scriptvariables.php";
 
+$FormTitle = "Insert $EntityCaption";
 
 
 $ButtonCaption="Confirm";
@@ -148,7 +149,7 @@ if (!empty($itemsPHP)) {
 $MainContent .= '
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Purchase Requisition</h5>
+        <h5 class="mb-0">'.$FormTitle .'</h5>
     </div>
     <div class="card-body">
         <form id="requisitionForm" action="' . ApplicationURL("PurchaseOrder", "Insertupdateaction") . '" method="post">
@@ -182,11 +183,7 @@ $MainContent .= '
             </div>
 
             <div class="row g-3 mb-3">
-                <div class="col-md-6 col-12">
-                     <label class="form-label">MPRNO</label>
 
-                    <input type="number" name="MPRNO" value="' . $TheEntityName["MPRNO"] . '" placeholder="MPR No" class="form-control">
-                </div>
                 <div class="col-md-6 col-12">
                     <label class="form-label">Comments</label>
 
@@ -200,11 +197,7 @@ $MainContent .= '
                 <input type="text" name="Contract" value="' . $TheEntityName["Contract"] . '" placeholder="Contact Person" class="form-control">
             </div>
 
-            <div class="mb-3">
-               <label class="form-label">Remark</label>
 
-                <input type="text" name="Remark" value="' . $TheEntityName["Remark"] . '" placeholder="Remark" class="form-control">
-            </div>
 
             <div class="mb-4">
                 <h6 class="mb-3">Items</h6>

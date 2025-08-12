@@ -51,7 +51,6 @@ if ($ErrorUserInput["_Error"]) {
             "Date" => $_POST["Date"],
 
             "RequiredDate"=>$_POST["RequiredDate"],
-            "MPRNO"=>$_POST["MPRNO"],
 
             "Contract"=>$_POST["Contract"],
             "NB"=>$_POST["NB"],
@@ -59,7 +58,7 @@ if ($ErrorUserInput["_Error"]) {
 
 
             "TotalRequisitionAmount" => $_POST["TotalRequisitionAmount"],
-            "Remark" => $_POST["Remark"],
+
             "Confirm" => $_POST["Confirm"],
             "RequisitionConfirmID" => $purchaseConfirmID,
 
