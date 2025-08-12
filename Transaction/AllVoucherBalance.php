@@ -658,7 +658,7 @@ foreach ($AllBankCash as $key => $BankCash) {
             $totalCR += $tx['cr']; 
         }
     }
-    echo "Bank: " . $BankCash['BankCashName'] . " | Total CR: " . $totalCR . "<br>";
+    echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
     
 
 
