@@ -26,7 +26,9 @@
 
         
         $_POST["Image"]	=ProcessUpload("Image", $Application["UploadPath"]);
-
+		
+		$GetWorkerName =SQL_Select("Worker","WorkerID=xxxx","",true);
+		echo $GetWorkerName["name"];
 		// give the data dase fields name and the post value name
 	    $TheEntityName=SQL_InsertUpdate(
 	        $Entity="{$Entity}",
