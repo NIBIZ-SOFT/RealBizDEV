@@ -1,7 +1,7 @@
 <?php
 
 // For Showing Database
-$opt = SQL_Select("Product");
+$opt = SQL_Select("Products");
 if (!empty($opt)) {
     echo "<table border='1' cellpadding='6' cellspacing='0'>";
 
