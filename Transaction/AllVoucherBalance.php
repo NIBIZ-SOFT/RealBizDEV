@@ -646,22 +646,46 @@ $MainContent .= '
             <tbody>
 ';
 
-$AllBankCash      = SQL_Select("BankCash");
+// $AllBankCash      = SQL_Select("BankCash");
 
-$totalCR = 0;
+// $totalCR = 0;
+
+// foreach ($AllBankCash as $key => $BankCash) {
+//     $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+
+//     foreach ($Transactions as $tx) {
+//         if (isset($tx['cr']) && is_numeric($tx['cr'])) {
+//             $totalCR += $tx['cr']; 
+//         }
+//     }
+//     print_r($tx);
+//     echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
+
+// }
+
+
+$AllBankCash = SQL_Select("BankCash");
 
 foreach ($AllBankCash as $key => $BankCash) {
-    $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+    $totalCR = 0; 
+
+    $Transactions = SQL_Select("
+        transaction 
+        WHERE VoucherType != 'JV' 
+        AND BankCashID = {$BankCash['BankCashID']} 
+        AND ProjectID = {$CategoryID} 
+        AND Date BETWEEN '{$FromDate}' AND '{$ToDate}'
+    ");
 
     foreach ($Transactions as $tx) {
         if (isset($tx['cr']) && is_numeric($tx['cr'])) {
-            $totalCR += $tx['cr']; 
+            $totalCR += $tx['cr'];
         }
     }
-    print_r($tx);
-    echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
 
+    echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
 }
+
 $MainContent .= '
 </div> <!-- end third row -->
 
