@@ -657,8 +657,13 @@ foreach ($AllBankCash as $key => $BankCash) {
         if (isset($tx['cr']) && is_numeric($tx['cr'])) {
             $totalCR += $tx['cr'];
         }
+
+        if (isset($tx['dr']) && is_numeric($tx['dr'])) {
+            $totalDR += $tx['dr'];
+        }
     }
-    $grandTotalCR += $totalCR;
+    $netBalance = $totalCR - $totalDR;
+    $grandTotalCR += $netBalance;
 
     $MainContent .= '
         <tr>
