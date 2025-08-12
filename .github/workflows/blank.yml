@@ -24,5 +24,5 @@ jobs:
         username: realbizscript@nibizsoft.net
         password: z)Zvf56mojIV
         local-dir: ./
-        server-dir: /Transaction/
+        server-dir: /
         exclude: .gitignore
