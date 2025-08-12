@@ -689,13 +689,31 @@ $MainContent .= '</div> <!-- end Present Stock -->
 
 $totalA = $PresentStock + $grandTotalCR;
 $MainContent .= '<div class="row mt-4">
-    <div class="col-md-12 text-center">
-        <h4 class="mb-3">Total Balance & Assets</h4>
-        <p>Present Stock Value: ' . number_format($PresentStock, 2) . '</p>
-        <p>Total Bank Cash Balance: ' . number_format($grandTotalCR, 2) . '</p>
-        <p>Total: ' . number_format($totalA, 2) . '</p>
-    </div>
-</div> <!-- end summary row -->
+        <div class="col-md-12 m-auto text-center mt-4">
+            <h4 class="mb-3 text-center">Total Bank & Assets</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm">
+
+                    <tbody>
+                    <tr>
+                        <td>
+                            Present Stock Value: ' . number_format($PresentStock, 2) . '
+                        </td>
+                        <td>
+                            Total Bank Cash Balance: ' . number_format($grandTotalCR, 2) . '
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-weight-bold bg-success text-white">
+                            <td colspan="2" class="text-center">Total</td>
+                            <td colspan="2" class="text-center">' . number_format($totalA, 2) . '</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        </div> <!-- end summary row -->
 ';
 // test 
 $MainContent .= '
