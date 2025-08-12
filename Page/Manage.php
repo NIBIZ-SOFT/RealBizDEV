@@ -1,0 +1,1 @@
+<?  $MainContent.=StaticContent($StaticContentName='Manage'); ?>
