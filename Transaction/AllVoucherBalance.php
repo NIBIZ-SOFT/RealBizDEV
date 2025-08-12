@@ -637,34 +637,16 @@ $MainContent .= '
         <table class="table table-bordered table-striped table-sm">
             <thead>
                 <th>SL</th>
-                <th>Date</th>
-                <th>Head of Account</th>
-                <th>QTY</th>
-                <th>Rate</th>
-                <th>Amount</th>
+                <th>Bank Name</th>
+                <th>Balance</th>
             </thead>
             <tbody>
 ';
 
-// $AllBankCash      = SQL_Select("BankCash");
-
-// $totalCR = 0;
-
-// foreach ($AllBankCash as $key => $BankCash) {
-//     $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
-
-//     foreach ($Transactions as $tx) {
-//         if (isset($tx['cr']) && is_numeric($tx['cr'])) {
-//             $totalCR += $tx['cr']; 
-//         }
-//     }
-//     print_r($tx);
-//     echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
-
-// }
-
 
 $AllBankCash = SQL_Select("BankCash");
+
+$grandTotalCR = 0;
 
 foreach ($AllBankCash as $key => $BankCash) {
     $totalCR = 0; 
@@ -677,8 +659,26 @@ foreach ($AllBankCash as $key => $BankCash) {
         }
     }
 
-    echo "Bank: " . $BankCash['AccountTitle'] . " | Total CR: " . $totalCR . "<br>";
+    $MainContent .= '
+        <tr>
+            <td>' . ($key + 1) . '</td>
+            <td>' . $BankCash['AccountTitle'] . '</td>
+            <td>' . $totalCR . '</td>
+        </tr>
+    ';
 }
+$MainContent .= '
+            <tr class="font-weight-bold bg-success text-white">
+                <td colspan="1" class="text-right">TOTAL</td>
+                <td>' . number_format($grandTotalCR += $totalCR, 2) . '</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+';
+
+$MainContent .= '</div> <!-- end Present Stock -->  
+';
 
 $MainContent .= '
 </div> <!-- end third row -->
