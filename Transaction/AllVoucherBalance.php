@@ -292,25 +292,25 @@ if (!empty($JournalData)) {
 }
 
 
-$totalStockValue=0;
-$totalUsedStockValue=0;
+$totalStockValue = 0;
+$totalUsedStockValue = 0;
 
-$stocks= SQL_Select("stock where ProjectID={$CategoryID} and StockIsActive=1 and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
-$UsedStocks= SQL_Select("usedstock where ProjectID={$CategoryID}  and UsedStockIsActive=1  and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
+$stocks = SQL_Select("stock where ProjectID={$CategoryID} and StockIsActive=1 and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
+$UsedStocks = SQL_Select("usedstock where ProjectID={$CategoryID}  and UsedStockIsActive=1  and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
 
 $PurchaseOrder = SQL_Select("purchase where CategoryID={$CategoryID} and Confirm='Confirm' and IssuingDate BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
 
-foreach ($stocks as $stock){
-    $totalStockValue +=$stock["Value"];
+foreach ($stocks as $stock) {
+    $totalStockValue += $stock["Value"];
 }
 
-foreach ($UsedStocks as $UsedStock){
-    $totalUsedStockValue +=$UsedStock["Value"];
+foreach ($UsedStocks as $UsedStock) {
+    $totalUsedStockValue += $UsedStock["Value"];
 }
 
-foreach ($PurchaseOrder as $Order){
-    $totalPurchaseAmount +=$Order["PurchaseAmount"];
+foreach ($PurchaseOrder as $Order) {
+    $totalPurchaseAmount += $Order["PurchaseAmount"];
 }
 
 
@@ -649,8 +649,8 @@ $AllBankCash = SQL_Select("BankCash");
 $grandTotalCR = 0;
 
 foreach ($AllBankCash as $key => $BankCash) {
-    $totalCR = 0; 
-    $totalDR = 0; 
+    $totalCR = 0;
+    $totalDR = 0;
 
     $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
@@ -688,33 +688,43 @@ $MainContent .= '</div> <!-- end Present Stock -->
 ';
 
 $totalA = $PresentStock + $grandTotalCR;
-$MainContent .= '<div class="row mt-4">
-        <div class="col-md-12 m-auto text-center mt-4">
-            <h4 class="mb-3 text-center">Total Bank & Assets</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm">
 
-                    <tbody>
-                    <tr>
-                        <td>
-                            Present Stock Value: ' . number_format($PresentStock, 2) . '
-                        </td>
-                        <td>
-                            Total Bank Cash Balance: ' . number_format($grandTotalCR, 2) . '
-                        </td>
-                    </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="font-weight-bold bg-success text-white">
-                            <td colspan="2" class="text-center">Total</td>
-                            <td colspan="2" class="text-center">' . number_format($totalA, 2) . '</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-        </div> <!-- end summary row -->
+
+
+$MainContent .= '
+<div class="col-md-8 m-auto text-center mt-4">
+    <h4 class="mb-3 text-center">Bank Cash Report</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm">
+            <thead>
+                <th>SL</th>
+                <th>Present Stock Value</th>
+                <th>Total Bank Cash Balance</th>
+            </thead>
+            <tbody>
+
+            <tr>
+                <td> 1 </td>
+                <td>' . $PresentStock . '</td>
+                <td>' . $grandTotalCR . '</td>
+            </tr>
+
+            <tr class="font-weight-bold bg-success text-white">
+                <td colspan="2" class="text-right">TOTAL</td>
+                <td>' . number_format($totalA, 2) . '</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 ';
+
+$MainContent .= '</div> <!-- end Present Stock -->  
+';
+
+
+
+
+
 // test 
 $MainContent .= '
 </div> <!-- end third row -->
