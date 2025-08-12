@@ -697,17 +697,17 @@ $MainContent .= '
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm">
             <thead>
-                <th>SL</th>
-                <th>Present Stock Value</th>
-                <td>' . $PresentStock . '</td>
+                <th>#</th>
+                <th>Total Bank Cash Balance</th>
+                <td>' . $grandTotalCR . '</td>
                 
             </thead>
             <tbody>
 
             <tr>
-                <td> 1 </td>
-                <th>Total Bank Cash Balance</th>
-                <td>' . $grandTotalCR . '</td>
+                <td> # </td>
+                <th>Present Stock Value</th>
+                <td>' . $PresentStock . '</td>
             </tr>
 
             <tr class="font-weight-bold bg-success text-white">
