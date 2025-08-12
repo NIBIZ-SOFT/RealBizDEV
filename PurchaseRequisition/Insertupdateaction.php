@@ -44,14 +44,13 @@
 		"Date"=>$_POST["Date"],
 
         "RequiredDate"=>$_POST["RequiredDate"],
-        "MPRNO"=>$_POST["MPRNO"],
+
 
 		"TotalRequisitionAmount"=>$_POST["TotalRequisitionAmount"],
 
         "NB" => $_POST["NB"],
 
 
-		"Remark"=>$_POST["Remark"],
 
 		"Items"=>json_encode($_POST["items"]),
 

@@ -1,8 +1,12 @@
 <?php
 $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
+$_POST["FromDate"] = '2025-08-11';
+$_POST["ToDate"]= '2025-08-11';
+$_POST["CategoryID"]= 23;
 
 $FromDate = isset($_POST["FromDate"]) ? $_POST["FromDate"] : null;
-$ToDate = isset($_POST["ToDate"]) ? $_POST["ToDate"] : null;
+$ToDate = isset
+($_POST["ToDate"]) ? $_POST["ToDate"] : null;
 $CategoryID = isset($_POST["CategoryID"]) ? $_POST["CategoryID"] : null;
 
 if (empty($CategoryID)) {
@@ -292,25 +296,25 @@ if (!empty($JournalData)) {
 }
 
 
-$totalStockValue=0;
-$totalUsedStockValue=0;
+$totalStockValue = 0;
+$totalUsedStockValue = 0;
 
-$stocks= SQL_Select("stock where ProjectID={$CategoryID} and StockIsActive=1 and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
-$UsedStocks= SQL_Select("usedstock where ProjectID={$CategoryID}  and UsedStockIsActive=1  and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
+$stocks = SQL_Select("stock where ProjectID={$CategoryID} and StockIsActive=1 and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
+$UsedStocks = SQL_Select("usedstock where ProjectID={$CategoryID}  and UsedStockIsActive=1  and  Date BETWEEN '{$FromDate}' AND  '{$ToDate}'");
 
 $PurchaseOrder = SQL_Select("purchase where CategoryID={$CategoryID} and Confirm='Confirm' and IssuingDate BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
 
-foreach ($stocks as $stock){
-    $totalStockValue +=$stock["Value"];
+foreach ($stocks as $stock) {
+    $totalStockValue += $stock["Value"];
 }
 
-foreach ($UsedStocks as $UsedStock){
-    $totalUsedStockValue +=$UsedStock["Value"];
+foreach ($UsedStocks as $UsedStock) {
+    $totalUsedStockValue += $UsedStock["Value"];
 }
 
-foreach ($PurchaseOrder as $Order){
-    $totalPurchaseAmount +=$Order["PurchaseAmount"];
+foreach ($PurchaseOrder as $Order) {
+    $totalPurchaseAmount += $Order["PurchaseAmount"];
 }
 
 
@@ -631,39 +635,98 @@ $MainContent .= '</div> <!-- end Present Stock -->
 
 
 $MainContent .= '
-<div class="col-md-6 text-center mt-4">
+<div class="col-md-8 m-auto text-center mt-4">
     <h4 class="mb-3 text-center">Bank Cash Report</h4>
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm">
             <thead>
                 <th>SL</th>
-                <th>Date</th>
-                <th>Head of Account</th>
-                <th>QTY</th>
-                <th>Rate</th>
-                <th>Amount</th>
+                <th>Bank Name</th>
+                <th>Balance</th>
             </thead>
             <tbody>
 ';
 
-$AllBankCash      = SQL_Select("BankCash");
 
-$totalCR = 0;
+$AllBankCash = SQL_Select("BankCash");
+
+$grandTotalCR = 0;
 
 foreach ($AllBankCash as $key => $BankCash) {
+    $totalCR = 0;
+    $totalDR = 0;
+
     $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
     foreach ($Transactions as $tx) {
         if (isset($tx['cr']) && is_numeric($tx['cr'])) {
-            $totalCR += $tx['cr']; 
+            $totalCR += $tx['cr'];
+        }
+
+        if (isset($tx['dr']) && is_numeric($tx['dr'])) {
+            $totalDR += $tx['dr'];
         }
     }
-    echo "Bank: " . $BankCash['BankCashName'] . " | Total CR: " . $totalCR . "<br>";
-    
+    $netBalance = $totalCR - $totalDR;
+    $grandTotalCR += $netBalance;
 
-
-
+    $MainContent .= '
+        <tr>
+            <td>' . ($key + 1) . '</td>
+            <td>' . $BankCash['AccountTitle'] . '</td>
+            <td>' . $netBalance . '</td>
+        </tr>
+    ';
 }
+$MainContent .= '
+            <tr class="font-weight-bold bg-success text-white">
+                <td colspan="2" class="text-right">TOTAL</td>
+                <td>' . number_format($grandTotalCR, 2) . '</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+';
+
+$MainContent .= '</div> <!-- end Present Stock -->  
+';
+
+$totalA = $PresentStock + $grandTotalCR;
+
+
+
+$MainContent .= '
+<div class="col-md-8 m-auto text-center mt-4">
+    <h4 class="mb-3 text-center">Total Bank & Assets</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm">
+            <thead>
+                <th>#</th>
+                <th>Total Bank Cash Balance</th>
+                <td>' . $grandTotalCR . '</td>
+                
+            </thead>
+            <tbody>
+
+            <tr>
+                <td> # </td>
+                <th>Present Stock Value</th>
+                <td>' . $PresentStock . '</td>
+            </tr>
+
+            <tr class="font-weight-bold bg-success text-white">
+                <td colspan="2" class="text-right">TOTAL</td>
+                <td>' . number_format($totalA, 2) . '</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+';
+
+$MainContent .= '</div> <!-- end Present Stock -->  
+';
+
+
 $MainContent .= '
 </div> <!-- end third row -->
 

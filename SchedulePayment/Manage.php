@@ -208,15 +208,7 @@ if (!empty($allActualPaymentDetails)) {
 			  <td style="text-align:center">'.$allScheduleDetail["ModeOfPayment"].'</td>
 			  <td style="text-align:center">'.$allScheduleDetail["ChequeNo"].'</td>
 			  <td style="text-align:center">'.$allScheduleDetail["BankName"].'</td>
-			  <td style="text-align:center">'.$allScheduleDetail["Remark"].'</td>
-			  <td>
-
-			  <a class="btn btn-warning" href="' . ApplicationURL("SchedulePayment", "AddActualPayment&SalesID={$_GET["SalesID"]}&ActualSalsePaymentID={$allScheduleDetail["ActualSalsePaymentID"]}").'">Edit</a>
-			  
-			  <a  style="margin-top:5px; " class="btn btn-danger " href="' . ApplicationURL("SchedulePayment", "AddActualPayment&SalesID={$_GET["SalesID"]}&ActualSalsePaymentID={$allScheduleDetail["ActualSalsePaymentID"]}&Delete=1").'">Delete</a>
-			  
-			  </td>
-			  
+			  <td style="text-align:center">'.$allScheduleDetail["Remark"].'</td>	  
 			</tr>
 
 		';
@@ -337,7 +329,6 @@ if (empty($allScheduleDetails)) {
 	  <th style=" font-size:14px; ">Chq No</th>
 	  <th style=" font-size:14px; ">Bank Name</th>
 	  <th style=" font-size:14px; ">Remarks</th>
-	  <th style=" font-size:14px;">Action</th>
 	</tr>
 
 	' . $ActualleItems . '

@@ -26,7 +26,8 @@
 
         
         $_POST["Image"]	=ProcessUpload("Image", $Application["UploadPath"]);
-
+		
+		
 		// give the data dase fields name and the post value name
 	    $TheEntityName=SQL_InsertUpdate(
 	        $Entity="{$Entity}",
