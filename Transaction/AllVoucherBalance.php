@@ -650,6 +650,7 @@ $grandTotalCR = 0;
 
 foreach ($AllBankCash as $key => $BankCash) {
     $totalCR = 0; 
+    $totalDR = 0; 
 
     $Transactions      = SQL_Select("transaction WHERE VoucherType != 'JV' AND BankCashID = {$BankCash['BankCashID']} and ProjectID={$CategoryID} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
