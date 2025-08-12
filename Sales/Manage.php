@@ -1,8 +1,6 @@
 <?
 
 
-
-
 	GetPermission("OptionSales");
 	
 	include "./script/{$_REQUEST["Base"]}/Scriptvariables.php";
@@ -45,13 +43,14 @@ $MainContent .= '
         <hr>
         ';
 
+	$productName = "SELECT FlatType as Value FROM tblproducts WHERE ProductsID =:ProductID";
 	// DataGrid
 	$MainContent.= CTL_Datagrid(
 		$Entity,
-		$ColumnName=array( "SalesID" ,"Image" ,"Division","CustomerName" , "SellerName", "ProjectName" , "ProductName" , "Quantity" , "Discount" ,"SalesDate"),
+		$ColumnName=array( "SalesID" ,"Image" ,"Division","CustomerName" , "SellerName", "ProjectName" , "$productName" , "Quantity" , "Discount" ,"SalesDate"),
 		$ColumnTitle=array( "Sales ID","Image","Division" ,"Customer Name","SellerName", "Project Name" , "Product Name","QTY", "Discount" ,"Sales Date" ),
 		$ColumnAlign=array( "left","left","left","left", "left" , "left" ,"left" ,"left","left","left" ),
-		$ColumnType=array( "text","imagelink","text","text", "text" , "text" ,"text" ,"text","text","date" ),
+		$ColumnType=array( "text","imagelink","text","text", "text" , "text" ,"sql" ,"text","text","date" ),
 		$Rows=SQL_Select($Entity="{$Entity}", $Where ,  $OrderBy="{$_REQUEST["SortBy"]} {$_REQUEST["SortType"]}", $SingleRow=false, $RecordShowFrom=$_REQUEST["RecordShowFrom"], $RecordShowUpTo=$Application["DatagridRowsDefault"], $Debug=false),
 		$SearchHTML="".CTL_InputText($Name="FreeText","","",26, $Class="DataGridSearchBox")." ",
 		$ActionLinks=true,
