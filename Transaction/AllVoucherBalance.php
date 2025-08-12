@@ -693,7 +693,7 @@ $totalA = $PresentStock + $grandTotalCR;
 
 $MainContent .= '
 <div class="col-md-8 m-auto text-center mt-4">
-    <h4 class="mb-3 text-center">Bank Cash Report</h4>
+    <h4 class="mb-3 text-center">Total Bank & Assets</h4>
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-sm">
             <thead>
