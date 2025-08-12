@@ -646,7 +646,7 @@ $MainContent .= '
             <tbody>
 ';
 
-$AllBankCash      = SQL_Select("BankCash WHERE BankCashID = {$BankCash['BankCashID']}");
+$AllBankCash      = SQL_Select("BankCash");
 
 $totalCR = 0;
 
