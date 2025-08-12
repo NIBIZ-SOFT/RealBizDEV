@@ -686,7 +686,7 @@ $MainContent .= '
 
 $MainContent .= '</div> <!-- end Present Stock -->  
 ';
-
+// test 
 $MainContent .= '
 </div> <!-- end third row -->
 
