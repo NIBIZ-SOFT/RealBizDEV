@@ -658,6 +658,7 @@ foreach ($AllBankCash as $key => $BankCash) {
             $totalCR += $tx['cr'];
         }
     }
+    $grandTotalCR += $totalCR;
 
     $MainContent .= '
         <tr>
@@ -669,8 +670,8 @@ foreach ($AllBankCash as $key => $BankCash) {
 }
 $MainContent .= '
             <tr class="font-weight-bold bg-success text-white">
-                <td colspan="1" class="text-right">TOTAL</td>
-                <td>' . number_format($grandTotalCR += $totalCR, 2) . '</td>
+                <td colspan="2" class="text-right">TOTAL</td>
+                <td>' . number_format($grandTotalCR, 2) . '</td>
             </tr>
         </tbody>
     </table>
