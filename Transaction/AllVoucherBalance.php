@@ -1,8 +1,12 @@
 <?php
 $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
+$_POST["FromDate"] = '2025-08-11';
+$_POST["ToDate"]= '2025-08-11';
+$_POST["CategoryID"]= 23;
 
 $FromDate = isset($_POST["FromDate"]) ? $_POST["FromDate"] : null;
-$ToDate = isset($_POST["ToDate"]) ? $_POST["ToDate"] : null;
+$ToDate = isset
+($_POST["ToDate"]) ? $_POST["ToDate"] : null;
 $CategoryID = isset($_POST["CategoryID"]) ? $_POST["CategoryID"] : null;
 
 if (empty($CategoryID)) {
