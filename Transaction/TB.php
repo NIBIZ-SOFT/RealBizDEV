@@ -19,39 +19,13 @@ if (!empty($FromDate) && !empty($ToDate)) {
         $Projects = SQL_Select("category");
     }
 
-
-
-
-
-
-
+    $projectHtml = ''; // Initialize outside the loop
+    $totalDrAmount = 0;
+    $totalCrAmount = 0;
 
     foreach ($Projects as $Project) {
-
-        $CurrentBankCashs = SQL_Select("bankcash");
-        $CurrentBankCashTotalBalance = 0;
-
-        foreach ($CurrentBankCashs as $CurrentBankCash) {
-            $CurrentTransactionInfos = SQL_Select("transaction WHERE BankCashID = {$CurrentBankCash["BankCashID"]} and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
-
-            $CurrentdrAmount = 0;
-            $CurrentcrAmount = 0;
-
-            foreach ($CurrentTransactionInfos as $CurrentTransactionInfo) {
-                $CurrentdrAmount += $CurrentTransactionInfo["dr"];
-                $CurrentcrAmount += $CurrentTransactionInfo["cr"];
-            }
-
-            $Currentbalance = $CurrentcrAmount - $CurrentdrAmount;
-            $CurrentBankCashTotalBalance += $Currentbalance;
-        }
-
-
-
-//        print_r($Project);
-//        die();
         // Get all transactions for the current project
-        $transactions = SQL_Select("transaction WHERE ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+        $transactions = SQL_Select("transaction","voucherType != 'JV' and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
         //$transactions = SQL_Select("transaction WHERE ProjectID = {$Project["CategoryID"]} ");
 
         $subDrTotal = 0;
@@ -71,7 +45,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 if (empty($uniqueHeadOfAccountId)) continue;
 
                 // Get transactions for each unique HeadOfAccount
-                $UniqueTransactionHeadOfAccaunts = SQL_Select("transaction WHERE HeadOfAccountID = {$uniqueHeadOfAccountId} AND ProjectID = {$Project["CategoryID"]}  and Date BETWEEN '{$FromDate}' AND '{$ToDate}'" );
+                $UniqueTransactionHeadOfAccaunts = SQL_Select("transaction WHERE voucherType != 'JV' and HeadOfAccountID = {$uniqueHeadOfAccountId} AND ProjectID = {$Project["CategoryID"]}  and Date BETWEEN '{$FromDate}' AND '{$ToDate}'" );
 
                 // Get HeadOfType and HeadOfAccount details
                 $HeadOfAccountID = $UniqueTransactionHeadOfAccaunts[0]["HeadOfAccountID"];
@@ -105,7 +79,8 @@ if (!empty($FromDate) && !empty($ToDate)) {
                     'HeadOfAccountName' => $UniqueTransactionHeadOfAccaunts[0]["HeadOfAccountName"],
                     'HeadOfAccountID' => $UniqueTransactionHeadOfAccaunts[0]["HeadOfAccountID"],
                     'balanceDr' => $balanceDr,
-                    'balanceCr' => $balanceCr
+                    'balanceCr' => $balanceCr,
+                    'GLCode' => SQL_Select("expensehead", "ExpenseHeadID = '{$UniqueTransactionHeadOfAccaunts[0]["HeadOfAccountID"]}'")[0]["GLCode"] //ADDED THIS LINE
                 ];
             }
 
@@ -113,24 +88,22 @@ if (!empty($FromDate) && !empty($ToDate)) {
             $trHtml = '';
             $trHtml2 = '';
 
-            $trHtml2 .= '
-                    <tr class="parent-head">
-                        <th class="text-center" scope="row">' . $sl++ . '</th>
-                        <th colspan="2" rowspan="' . $childsl . '" class="text-left" style="background-color: #f1f1f1; font-weight: bold;">1000 - Current Assets</th>
-                        <th class="text-right" style="background-color: #f1f1f1; font-weight: bold;">'.$CurrentBankCashTotalBalance.'</th>
-                        <th class="text-right" style="background-color: #f1f1f1; font-weight: bold;">0</th>
-                    </tr>';
 
-            $sl = 1;
+
+
+
+            $sl = 2;
             $childsl = 1;
 
             //Bank And Cash
-            $BankCashes=SQL_Select("bankcash");
+            $BankCashes=SQL_Select("bankcash","1=1","GLCode ASC"); //ADDED ASC
             $bankCashName="";
             $totalBankCashBalance=0;
+            $bankCashData = []; //ADDED THIS LINE
+
             foreach ($BankCashes as $BankCash){
 
-                $TransactionInfos=SQL_Select("transaction WHERE BankCashID = {$BankCash["BankCashID"]} and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+                $TransactionInfos=SQL_Select("transaction WHERE voucherType != 'JV' and BankCashID = {$BankCash["BankCashID"]}  and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
                 $drAmount=0;
                 $crAmount=0;
@@ -148,22 +121,59 @@ if (!empty($FromDate) && !empty($ToDate)) {
 
                 }
 
+//                if ($crAmount > $drAmount) {
                 $balance = $crAmount - $drAmount;
+//                } elseif ($drAmount > $crAmount) {
+//                    $balance = $drAmount - $crAmount;
+//                } else {
+//                    $balance = 0;
+//                }
                 //$totalBankCashBalance +=$balance;
 //                $subDrTotal += $drAmount;
                 $subDrTotal += $balance;
-//                $subCrTotal += $crAmount;
-                if($balance>0)
-                    $trHtml2 .= '
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td>'.$BankCash["GLCode"].'-'.$bankCashName.'</td>
-                                <td class="text-right">'.BangladeshiCurencyFormat($balance).'</td>
-                                <td class="text-right">0</td>
-                            </tr>';
+//                $subCrTotal += $balance;
+                if($balance){
+                    $bankCashData[] = [
+                        'GLCode' => $BankCash["GLCode"],
+                        'AccountTitle' => $bankCashName,
+                        'crAmount' => $crAmount,
+                        'drAmount' => $drAmount,
+                        'Balance' => $balance,
+                        'bid' => $BankCash["BankCashID"]
+                    ];
+                }
+            }
 
 
+
+
+
+            $totalBankCashBalancex = 0; // Initialize total balance
+
+            foreach ($bankCashData as $datax) {
+                $totalBankCashBalancex += $datax["Balance"]; // Accumulate the balance
+            }
+            $trHtml2 .= '
+    <tr class="parent-head">
+         <th class="text-center" scope="row">1</th>
+
+         <th colspan="2" class="text-left" style="background-color: #f1f1f1; font-weight: bold;">1000 - Current Assets</th>
+        <th class="text-right" style="background-color: #f1f1f1; font-weight: bold;">' . BangladeshiCurencyFormat($totalBankCashBalancex) . '</th>
+        <th class="text-right" style="background-color: #f1f1f1; font-weight: bold;">0</th>
+    </tr>';
+
+
+
+
+            foreach($bankCashData as $data){  //ADDED THIS LOOP
+                $trHtml2 .= '
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>'.$data["GLCode"].'-'.$data["AccountTitle"].'</td>
+                                    <td class="text-right">'.BangladeshiCurencyFormat($data["Balance"]).'</td>
+                                                                        <td class="text-right">0</td>
+                                </tr>';
             }
 // end Bank And Cash
 
@@ -178,10 +188,29 @@ if (!empty($FromDate) && !empty($ToDate)) {
             foreach ($groupedTransactions as $HeadOfTypeName => $data) {
                 // Fetch the GLCode for the HeadOfTypeName
                 $HeadOfTypeGlCode = SQL_Select("incomeexpensetype", "GLCode = '{$HeadOfTypeName}'", "", true);
+                $HeadOfTypeNameValue = isset($HeadOfTypeGlCode["Name"]) ? $HeadOfTypeGlCode["Name"] : '';
 
-                if($data['drTotal']>0 and $data['crTotal']>0){
-                    $data['crTotal'] = $data['crTotal'] - $data['drTotal'];
-                    $data['drTotal'] = $data['drTotal'] - $data['crTotal'];
+                // if ($data['drTotal'] > 0 && $data['crTotal'] > 0) {
+                //     $diff = $data['crTotal'] - $data['drTotal'];
+
+                //     if ($diff > 0) {
+                //         $data['crTotal'] = $diff;
+                //         $data['drTotal'] = 0;
+                //     } elseif ($diff < 0) {
+                //         $data['drTotal'] = abs($diff);
+                //         $data['crTotal'] = 0;
+                //     } else {
+                //         $data['drTotal'] = 0;
+                //         $data['crTotal'] = 0;
+                //     }
+                // }
+
+
+                // Sort the children array by GLCode in ascending order.
+                if(isset($data['children']) && is_array($data['children'])){
+                    usort($data['children'], function ($a, $b) {
+                        return strcmp($a['GLCode'], $b['GLCode']);
+                    });
                 }
 
                 $trHtml .= '
@@ -195,17 +224,28 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 foreach ($data['children'] as $child) {
                     // Fetch the HeadOfAccount name
                     $HeadACName = SQL_Select("expensehead", "ExpenseHeadID = '{$child["HeadOfAccountID"]}'");
+                    $HeadOfAccountNameValue = isset($HeadACName[0]["HeadOfAccountName"]) ? $HeadACName[0]["HeadOfAccountName"] : '';
 
-                    if($child['balanceDr']>0 and $child['balanceCr']>0) {
-                        $child['balanceCr'] = $child['balanceCr'] - $child['balanceDr'];
-                        $child['balanceDr'] = $child['balanceDr'] - $child['balanceCr'];
+                    if ($child['balanceDr'] > 0 && $child['balanceCr'] > 0) {
+                        if ($child['balanceDr'] > $child['balanceCr']) {
+                            $child['balanceDr'] -= $child['balanceCr'];
+                            $child['balanceCr'] = 0;
+                        } elseif ($child['balanceCr'] > $child['balanceDr']) {
+                            $child['balanceCr'] -= $child['balanceDr'];
+                            $child['balanceDr'] = 0;
+                        } else {
+                            $child['balanceDr'] = 0;
+                            $child['balanceCr'] = 0;
+                        }
                     }
+
+
 
                     $trHtml .= '
                         <tr>
                             <td></td>
                             <td></td>
-                            <td>' . $HeadACName[0]['GLCode'] . '-' . $child["HeadOfAccountName"] . '</td>
+                            <td>' . $HeadACName[0]['GLCode'] . '-' . GetExpenseHeadName($child["HeadOfAccountID"]) . '</td>
                             <td class="text-right">' . BangladeshiCurencyFormat($child["balanceDr"]) . '</td>
                             <td class="text-right">' . BangladeshiCurencyFormat($child["balanceCr"]) . '</td>
                         </tr>';
@@ -237,7 +277,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 <table class="table table-bordered table-hover table-sm">
                     <thead>
                         <tr>
-                            <th class="text-center" colspan="6">Project Name - ' . $Project["Name"] . '</th>
+                            <th class="text-center" colspan="6">' . $Project["Name"] . '</th>
                         </tr>
                     </thead>
                     <thead>
@@ -258,7 +298,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
                         </tr>
                     </thead>
                     <tbody>
-                        ' .$trHtml2. $trHtml . '
+                        ' . $trHtml2 . $trHtml . '
                     </tbody>
                 </table>';
 

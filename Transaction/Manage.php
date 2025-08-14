@@ -73,6 +73,10 @@ $Where = "1 = 1";
 if ($_POST["FreeText"] != "")
     $Where .= " and {$_REQUEST["SearchCombo"]} LIKE '%{$_POST["FreeText"]}%'";
 
+
+    
+
+
 // DataGrid
 $MainContent .= CTL_Datagrid(
     $Entity,
@@ -101,4 +105,98 @@ $MainContentssss .= '
 	    </script>
 	
 	';
+
+//     // Voucher available But No Transaction =========
+
+// // CV
+$Crvoucher = SQL_Select("crVoucher", "CrVoucherIsDisplay = 0");
+foreach ($Crvoucher as $key => $value) {
+    $voucherID = $value['CrVoucherID'];
+    $Transaction = SQL_Select("transaction", "VoucherType = 'CV' AND VoucherNo = '{$voucherID}'");
+    if (empty($Transaction)) {
+        echo 'Voucher Type: CV, Voucher ID: '.$voucherID.' আছে কিন্তু Transaction নেই।'. '<br>';
+        // SQL_Delete("crVoucher where CrVoucherID = $voucherID");
+        $C = SQL_Select("crVoucher where CrVoucherID = $voucherID");
+        print_r($C);
+    }
+}
+
+// // DV
+$Drvoucher = SQL_Select("drvoucher", "DrVoucherIsDisplay = 0");
+foreach ($Drvoucher as $key => $value) {
+    $voucherID = $value['VoucherNo'];
+    $Transaction = SQL_Select("transaction", "VoucherType = 'DV' AND VoucherNo = '{$voucherID}'");
+    
+    if (empty($Transaction)) {
+        echo 'Voucher Type: DV, Voucher ID: '.$voucherID.' আছে কিন্তু Transaction নেই।' . '<br>';
+        // SQL_Delete("drvoucher where VoucherNo = $voucherID");
+        $C = SQL_Select("drvoucher where VoucherNo = $voucherID");
+        print_r($C);
+        
+    }
+}
+
+// JV
+$JvVoucher = SQL_Select("journalvoucher", "JournalVoucherIsDisplay = 0");
+foreach ($JvVoucher as $key => $value) {
+    $voucherID = $value['VoucherNo'];
+    $Transaction = SQL_Select("transaction", "VoucherType = 'JV' AND VoucherNo = '{$voucherID}'");
+    if (empty($Transaction)) {
+       echo 'Voucher Type: JV, Voucher ID: '.$voucherID.' আছে কিন্তু Transaction নেই।'. '<br>';
+    //    SQL_Delete("journalvoucher where VoucherNo = $voucherID");
+               $C = SQL_Select("journalvoucher where VoucherNo = $voucherID");
+               print_r($C);
+    }
+}
+
+// Contra
+$Contravoucher = SQL_Select("contravoucher", "ContraVoucherIsDisplay = 0");
+foreach ($Contravoucher as $key => $value) {
+    $voucherID = $value['VoucherNo'];
+    $Transaction = SQL_Select("transaction", "VoucherType = 'Contra' AND VoucherNo = '{$voucherID}'");
+    if (empty($Transaction)) {
+       echo 'Voucher Type: Contra, Voucher ID: '.$voucherID.' আছে কিন্তু Transaction নেই।'. '<br>';
+       //SQL_Delete("contravoucher where VoucherNo = $voucherID");
+         $C = SQL_Select("contravoucher where VoucherNo = $voucherID");
+         print_r($C);
+
+
+    }
+}
+
+// // ========= if Transaction Table VoucherNo Null OR  voucher Type Null =========
+
+$Transaction = SQL_Select("transaction");
+
+foreach ($Transaction as $key => $value) {
+    $voucherNo = isset($value['VoucherNo']) ? trim($value['VoucherNo']) : '';
+    $voucherType = isset($value['VoucherType']) ? $value['VoucherType'] : '';
+
+
+    if ($voucherNo == '' || $voucherType == '') {
+             // SQL_Delete("transaction where TransactionID = '{$value['TransactionID']}'");
+        echo 'Transaction ID: '.$value['TransactionID'].' এর VoucherNo বা VoucherType খালি আছে।'. '<br>';
+        continue;
+    }
+
+    // Voucher Type check
+    $isVoucherExists = false;
+
+    if ($voucherType == 'CV') {
+        $isVoucherExists = !empty(SQL_Select("crVoucher", "CrVoucherID = '{$voucherNo}'"));
+    } elseif ($voucherType == 'DV') {
+        $isVoucherExists = !empty(SQL_Select("drvoucher", "VoucherNo = '{$voucherNo}'"));
+    } elseif ($voucherType == 'JV') {
+        $isVoucherExists = !empty(SQL_Select("journalvoucher", "VoucherNo = '{$voucherNo}'"));
+    } elseif ($voucherType == 'Contra') {
+        $isVoucherExists = !empty(SQL_Select("contravoucher", "VoucherNo = '{$voucherNo}'"));
+    }
+
+    // If Voucher does not exist, delete the transaction
+    if (!$isVoucherExists) {
+        //SQL_Delete("transaction where TransactionID = '{$value['TransactionID']}'");
+        echo 'Transaction ID: '.$value['TransactionID'].' এর VoucherNo: '.$voucherNo.' এবং VoucherType: '.$voucherType.' এর জন্য কোন Voucher নেই।'. '<br>';
+        $voucherNo = $voucherNo ?: 'N/A';
+    }
+}
 ?>

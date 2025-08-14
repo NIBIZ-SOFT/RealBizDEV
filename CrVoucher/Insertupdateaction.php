@@ -69,6 +69,8 @@ if($ErrorUserInput["_Error"]){
             "Name" => $_POST["Name"],
             "CustomerID" => $_POST["CustomerID"],
             "CustomerName" => GetCustomerName($_POST["CustomerID"]),
+            "Division" => $_POST["Division"],
+
 
 
             "ProductsID" => $_POST["ProductsID"],
@@ -188,85 +190,17 @@ if($ErrorUserInput["_Error"]){
         );
 
 
-        /// Bank Charge Entry ////
-
-        if($_POST["BankCharge"]>0){
-
-            if($CheckforVoucerEntry["cr"]=="")
-                $TheEntityName = SQL_InsertUpdate(
-                    $Entity = "transaction",
-                    $TheEntityNameData = array(
-
-                        "ProjectID" => $_POST["ProjectID"],
-                        "ProjectName" => GetProjectName($_POST["ProjectID"]),
-
-                        "BankCashID" => $_POST["BankCashID"],
-                        "BankCashName" => GetBankCashTitle($_POST["BankCashID"]),
-
-                        "HeadOfAccountID" => $_POST["HeadOfAccountID"],
-                        "HeadOfAccountName" => GetExpenseHeadName($_POST["HeadOfAccountID"]),
-
-                        "Date" => $_POST["Date"],
-
-                        "Description" => $_POST["Description"],
-                        "dr" => $_POST["BankCharge"],
-                        "cr" => 0,
-                        "VoucherNo"=> $voucherNo,
-                        "VoucherType"=>"DV",
-
-                        "{$Entity}IsDisplay" => $_POST["{$Entity}IsDisplay"],
-                    ),
-                    ""
-                );
-
-
-            $TheEntityName = SQL_InsertUpdate(
-                $Entity = "transaction",
-                $TheEntityNameData = array(
-
-                    "ProjectID" => $_POST["ProjectID"],
-                    "ProjectName" => GetProjectName($_POST["ProjectID"]),
-
-                    "BankCashID" => $_POST["BankCashID"],
-                    "BankCashName" => GetBankCashTitle($_POST["BankCashID"]),
-
-                    "HeadOfAccountID" => 1914,
-                    "HeadOfAccountName" => GetExpenseHeadName(1914),
-
-                    "Date" => $_POST["Date"],
-
-                    "Description" => $_POST["Description"],
-                    "dr" => $_POST["BankCharge"],
-                    "cr" => 0,
-                    "VoucherNo"=> $voucherNo,
-                    "VoucherType"=>"DV",
-
-                    "{$Entity}IsDisplay" => $_POST["{$Entity}IsDisplay"],
-                ),
-                "VoucherNo='{$voucherNo}' and cr='0' and VoucherType='DV'"
-            );
-
-        }
-
-
-
-        /// End of Bank Charges
-
-
-
         //Send SMS Notification...
 
         $mobile_no = GetCustomerPhone($_POST["CustomerID"]);
         $message="
-Dear Customer,
-Your Payment {$_POST["Amount"]}Tk. received. Voucher No. {$voucherNo}
-Thanks,
-Sunset
+                    Dear Customer,
+                    Your Payment {$_POST["Amount"]}Tk. received. Voucher No. {$voucherNo}
+                    Thanks,
+                    Sunset
             ";
 
         n_bulk_sms($mobile_no,$message);
-
-
 
     }
 

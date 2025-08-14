@@ -106,26 +106,39 @@ $Input[] = array(
     "RowAttributes" => $customerFieldsStyle
 );
 
+
+$SaleSx = SQL_Select(
+    "Sales", 
+    "CustomerID = '{$TheEntityName["CustomerID"]}' AND ProductID = '{$TheEntityName["ProductsID"]}'"
+);
+
 // Sale ID dropdown
-$saleOptions = '<select name="SaleID" id="SaleID" class="form-select" required>';
-$saleOptions .= '<option value="0">Select Sale</option>';
+$saleOptions = '<select name="SaleID" id="SaleID" class="form-select form-control">
+<option value="">-- Select Sale --</option>';
 
 if ($TheEntityName["Type"] == 1 && !empty($TheEntityName["CustomerID"])) {
-    $sale = SQL_Select("Sales", "CustomerID = " . intval($TheEntityName["CustomerID"]));
-    foreach ($sale as $row) {
-        $selected = ($row["SalesID"] == $TheEntityName["SalesID"]) ? 'selected' : '';
-        $saleOptions .= '<option value="' . $row["SalesID"] . '" ' . $selected . '>' . $row["SalesID"] . '</option>';
-    }
+            $SaleSx = SQL_Select("Sales", "CustomerID =  " . $TheEntityName["CustomerID"]);
+            $sale = SQL_Select("Sales", "CustomerID =  " . $TheEntityName["CustomerID"]);
+            $selected = ($sale[0]["SalesID"] == $SaleSx[0]["SalesID"]) ? 'selected' : '';
+            $saleOptions .= '<option value="' . $sale[0]["SalesID"] . '" ' . $selected . '>' . $sale[0]["SalesID"] . '</option>';
+
+    // $sale = SQL_Select("Sales", "CustomerID = " . intval($TheEntityName["CustomerID"])). " AND ProductID = " . intval($TheEntityName["ProductsID"]);
+    // if (!empty($sale)) {
+    //     foreach ($sale as $row) {
+    //         $selected = ($row["SalesID"] == $SaleSx[0]["SalesID"]) ? 'selected' : '';
+    //         $saleOptions .= '<option value="' . $row["SalesID"] . '" ' . $selected . '>' . $row["SalesID"] . '</option>';
+    //     }
+    // }
 }
 $saleOptions .= '</select>';
-
 
 $Input[] = array(
     "VariableName" => "SaleID",
     "Caption" => "Sale ID",
     "ControlHTML" => $saleOptions,
-    "RowAttributes" => $customerFieldsStyle
+    "RowAttributes" => isset($customerFieldsStyle) ? $customerFieldsStyle : ""
 );
+
 
 // Product dropdown
 $productOptions = '<select id="Product" name="ProductsID" class="form-select">';
@@ -167,15 +180,30 @@ $Input[]=array("VariableName"=>"VendorName","Caption"=>"Title","ControlHTML"=>'
 
 
 $Input[] = array("VariableName" => "BankCashID", "Caption" => "Cash Type", "ControlHTML" => CCTL_BankCash($Name = "BankCashID", $TheEntityName["BankCashID"], $Where = "", $PrependBlankOption = false));
-$Input[] = array("VariableName" => "checkNumberArea", "Caption" => "Instrument Number", "ControlHTML" => CTL_InputText($Name = "ChequeNumber", $TheEntityName["ChequeNumber"], "", 30, "required"));
+$Input[] = array("VariableName" => "checkNumberArea", "Caption" => "Cheque Number", "ControlHTML" => CTL_InputText($Name = "ChequeNumber", $TheEntityName["ChequeNumber"], "", 30, "required"));
 $Input[] = array("VariableName" => "HeadOfAccountID", "Caption" => "Head Of Account", "ControlHTML" => GetExpenseID($Name = "HeadOfAccountID", $TheEntityName["HeadOfAccountID"], $Where = "", $PrependBlankOption = true));
-$Input[] = array("VariableName" => "HeadOfAccountID", "Caption" => "Division", "ControlHTML" => CommaSeperated($Name="Division",$Settings["Division"], $TheEntityName["Division"],""));
 
+$Settings = SQL_Select("Settings", "", "", true);
+$Divitions = explode(",", $Settings["Division"]);
+$DivitionList = array();
+foreach ($Divitions as $Divition) {
+    $DivitionList[] = array(
+        "value" => $Divition,
+        "text" => $Divition
+    );
+}
+$Input[] = array("VariableName" => "Division", "Caption" => "Division", "ControlHTML" => '
+<select class="form-select" name="Division" id="Division">
+    <option value="" disabled selected>Select Division</option>' .
+    implode('', array_map(function($option) use ($TheEntityName) {
+        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["Division"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+    }, $DivitionList)) .
+    '</select>');
 
 $Input[] = array("VariableName" => "BillNo", "Caption" => "M.R/Bill No", "ControlHTML" => CTL_InputText($Name = "BillNo", $TheEntityName["BillNo"], "", 30, "required"));
 
 $Input[] = array("VariableName" => "Date", "Caption" => "Date", "ControlHTML" => CTL_InputTextDate("Date", $TheEntityName["Date"], "", 30, "required"));
-$Input[] = array("VariableName" => "Amount", "Caption" => "Amount", "ControlHTML" => CTL_InputText("Amount", $TheEntityName["Amount"], "", 30, "required"));
+$Input[] = array("VariableName" => "Amount", "Caption" => "Amount", "ControlHTML" => CTL_InputNumber("Amount", $TheEntityName["Amount"], "", 30, "required"));
 //$Input[] = array("VariableName" => "BankCharge", "Caption" => "Bank Charge (-)", "ControlHTML" => CTL_InputText("BankCharge", $TheEntityName["BankCharge"], "", 30, "required"));
 $Input[] = array("VariableName" => "Description", "Caption" => "Particulars", "ControlHTML" => CTL_InputTextArea("Description", $TheEntityName["Description"], "", 5, "required"));
 
@@ -195,122 +223,160 @@ $MainContent .= FormInsertUpdate(
 
 
 $MainContent .= '
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-	';
-$MainContent .= '
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    console.log("Document ready"); // Debugging line
-    // Function to toggle fields based on type
-    function toggleFieldsByType() {
-        var type = $("#TypeSelector").val();
-        console.log("Type changed to: " + type); // Debugging line
-        
-        if (type === "1") { // Customer
-            $("[data-field-group=\'customer\']").show();
-            $("[data-field=\'Name\']").hide();
-        } else if (type === "2") { // Others
-            $("[data-field-group=\'customer\']").hide();
-            $("[data-field=\'Name\']").show();
-        } else {
-            $("[data-field-group=\'customer\'], [data-field=\'Name\']").hide();
-            console.log("Type changed to: " + type);
-        }
-    }
-    
-    // Handle customer change - load sales
-    $(document).on("change", "select[name=\'CustomerID\']", function() {
-        var customerId = $(this).val();
-        console.log("Customer changed to ID: " + customerId); // Debugging line
-        
-        var $saleSelect = $("select[name=\'SaleID\']");
-        
-        if (customerId > 0) {
-            console.log("Fetching sales for customer: " + customerId); // Debugging line
-            $.ajax({
-                url: window.location.href, // Use current page URL
-                method: "POST",
-                data: { 
-                    action: "get_sales_by_customer",
-                    CatID: customerId 
-                },
-                dataType: "json",
-                success: function(data) {
-                    console.log("Received sales data:", data); // Debugging line
+    <script>
+        $(document).ready(function() {
+            console.log("Document ready"); // Debugging line
+            // Function to toggle fields based on type
+            function toggleFieldsByType() {
+                var type = $("#TypeSelector").val();
+                console.log("Type changed to: " + type); // Debugging line
+                
+                if (type === "1") { // Customer
+                    $("[data-field-group=\'customer\']").show();
+                    $("[data-field=\'Name\']").hide();
+                } else if (type === "2") { // Others
+                    $("[data-field-group=\'customer\']").hide();
+                    $("[data-field=\'Name\']").show();
+                } else {
+                    $("[data-field-group=\'customer\'], [data-field=\'Name\']").hide();
+                    console.log("Type changed to: " + type);
+                }
+            }
+            
+            // Handle customer change - load sales
+            $(document).on("change", "select[name=\'CustomerID\']", function() {
+                var customerId = $(this).val();
+                console.log("Customer changed to ID: " + customerId); // Debugging line
+                
+                var $saleSelect = $("select[name=\'SaleID\']");
+                
+                if (customerId > 0) {
+                    console.log("Fetching sales for customer: " + customerId); // Debugging line
+                    $.ajax({
+                        url: window.location.href, // Use current page URL
+                        method: "POST",
+                        data: { 
+                            action: "get_sales_by_customer",
+                            CatID: customerId 
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            console.log("Received sales data:", data); // Debugging line
+                            $saleSelect.empty().append("<option value=\'0\'>Select Sale</option>");
+                            
+                            if (data && data.length > 0) {
+                                $.each(data, function(index, sale) {
+                                    $saleSelect.append($("<option></option>")
+                                        .attr("value", sale.SalesID)
+                                        .text(sale.SalesID));
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", status, error); // Debugging line
+                        }
+                    });
+                } else {
                     $saleSelect.empty().append("<option value=\'0\'>Select Sale</option>");
-                    
-                    if (data && data.length > 0) {
-                        $.each(data, function(index, sale) {
-                            $saleSelect.append($("<option></option>")
-                                .attr("value", sale.SalesID)
-                                .text(sale.SalesID));
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", status, error); // Debugging line
+                    $("select[name=\'ProductsID\']").empty().append("<option value=\'0\'>-- Select Product --</option>");
                 }
             });
-        } else {
-            $saleSelect.empty().append("<option value=\'0\'>Select Sale</option>");
-            $("select[name=\'ProductsID\']").empty().append("<option value=\'0\'>-- Select Product --</option>");
-        }
-    });
-    
-    // Handle sale change - load products
-    $(document).on("change", "select[name=\'SaleID\']", function() {
-        var saleId = $(this).val();
-        console.log("Sale changed to ID: " + saleId); // Debugging line
-        
-        var $productSelect = $("select[name=\'ProductsID\']");
-        
-        if (saleId > 0) {
-            console.log("Fetching products for sale: " + saleId); // Debugging line
-            $.ajax({
-                url: window.location.href,
-                method: "POST",
-                data: { 
-                    action: "get_products_by_sale",
-                    SaleID: saleId 
-                },
-                dataType: "json",
-                success: function(data) {
-                    console.log("Received products data:", data); // Debugging line
+            
+            // Handle sale change - load products
+            $(document).on("change", "select[name=\'SaleID\']", function() {
+                var saleId = $(this).val();
+                console.log("Sale changed to ID: " + saleId); // Debugging line
+                
+                var $productSelect = $("select[name=\'ProductsID\']");
+                
+                if (saleId > 0) {
+                    console.log("Fetching products for sale: " + saleId); // Debugging line
+                    $.ajax({
+                        url: window.location.href,
+                        method: "POST",
+                        data: { 
+                            action: "get_products_by_sale",
+                            SaleID: saleId 
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            console.log("Received products data:", data); // Debugging line
+                            $productSelect.empty().append("<option value=\'0\'>-- Select Product --</option>");
+                            
+                            if (data && data.length > 0) {
+                                $.each(data, function(index, product) {
+                                    var productName = product.FloorNumber + "-" + product.FlatType;
+                                    $productSelect.append($("<option></option>")
+                                        .attr("value", product.ProductsID)
+                                        .text(productName));
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", status, error); // Debugging line
+                        }
+                    });
+                } else {
                     $productSelect.empty().append("<option value=\'0\'>-- Select Product --</option>");
-                    
-                    if (data && data.length > 0) {
-                        $.each(data, function(index, product) {
-                            var productName = product.FloorNumber + "-" + product.FlatType;
-                            $productSelect.append($("<option></option>")
-                                .attr("value", product.ProductsID)
-                                .text(productName));
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", status, error); // Debugging line
                 }
             });
-        } else {
-            $productSelect.empty().append("<option value=\'0\'>-- Select Product --</option>");
-        }
-    });
-    
-    // Initialize
-    toggleFieldsByType();
-    $("#TypeSelector").on("change", toggleFieldsByType);
-    
-    // Trigger change if customer is pre-selected (edit mode)
-    if ($("select[name=\'CustomerID\']").val() > 0) {
-        $("select[name=\'CustomerID\']").trigger("change");
-    }
-});
-</script>
+            
+            // Initialize
+            toggleFieldsByType();
+            $("#TypeSelector").on("change", toggleFieldsByType);
+            
+            // Trigger change if customer is pre-selected (edit mode)
+            if ($("select[name=\'CustomerID\']").val() > 0) {
+                $("select[name=\'CustomerID\']").trigger("change");
+            }
+        });
+
+        var select = document.getElementById("TypeSelector"); 
+        
+    </script>
 ';
 
+$MainContent.="
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var select = document.getElementById('TypeSelector');
+
+    select.addEventListener('change', function () {
+        var selectedValue = this.value;
+
+        // Hide all controls first
+        document.getElementById('Control_103').style.display = 'none';
+        document.getElementById('Control_104').style.display = 'none';
+        document.getElementById('Control_105').style.display = 'none';
+        document.getElementById('Control_106').style.display = 'none';
+        document.getElementById('Control_107').style.display = 'none';
+        document.getElementById('SaleID').required = false;
+
+
+        // Show only the selected control
+        if (selectedValue === '1') {
+            document.getElementById('Control_104').style.display = 'block';
+            document.getElementById('Control_105').style.display = 'block';
+            document.getElementById('Control_106').style.display = 'block';
+            document.getElementById('Control_107').style.display = 'block';
+            document.getElementById('SaleID').required = true;
+            
+        } else if (selectedValue === '2') {
+            document.getElementById('Control_103').style.display = 'block';
+        }
+    });
+
+    // Optional: trigger once on page load
+    select.dispatchEvent(new Event('change'));
+});
+</script>
+
+
+";
 // AJAX handlers at the bottom of your script
 if (isset($_POST['action'])) {
     if ($_POST['action'] === 'get_sales_by_customer' && isset($_POST['CatID'])) {

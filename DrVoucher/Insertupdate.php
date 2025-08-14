@@ -43,15 +43,41 @@ if (isset($_REQUEST[$Entity . "ID"]) && isset($_REQUEST[$Entity . "UUID"]) && !i
     }
 }
 
+$Vendor = SQL_Select("vendor ");
+$VendorList = array();
+foreach ($Vendor as $VendorItem) {
+    $VendorList[] = array(
+        "value" => $VendorItem["VendorID"],
+        "text" => $VendorItem["VendorName"]
+    );
+}
+
+$MainContent = '<style>
+
+#Control_102{
+    display: none;
+}
+#Control_103{
+    display: none;
+}
+#Control_104{
+    display: none;
+}
+    </style>';
+
+
 $Input = array();
 $Input[] = array("VariableName" => "Type", "Caption" => "Type", "ControlHTML" => '<select class="form-select" name="Type" id="MyType"><option value="0">Select Type</option><option '.$ContructorID.' value="1">Contructor</option><option '.$VendorID.' value="2">Vendor</option><option '.$CustomerSelect.' value="3">Customer</option><option '.$OperationCost.' value="4">Operation Cost/Others</option></select>');
+                
+$Input[] = array("VariableName" => "VendorID", "Caption" => "Vendor", "ControlHTML" => '
+<select class="form-select" name="VendorID" id="">
+<option value="" disabled ' . $VendorSelect . '>Select a vendor</option>' .
+    implode('', array_map(function($option) use ($TheEntityName) {
+        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["VendorID"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+    }, $VendorList)) .
+'</select>');
 
-//$Input[] = array("VariableName" => "VendorID", "ControlHTML" => '<div id="VendorID_Wrap" ><l' . CCTL_Vendor($Name = "VendorID", $TheEntityName["VendorID"], $Where = "", $PrependBlankOption = true));
-//
-//$Input[] = array("VariableName" => "ContructorID", "ControlHTML" => '<div id="ContructorID_Wrap" ><label style="margin-left: -197px;margin-top: -9px;" class="control-label">Select Contructor</label>' . CCTL_Contructor($Name = "ContructorID", $TheEntityName["ContructorID"], $Where = "", $PrependBlankOption = true) . '</div>');
-//
-//$Input[] = array("VariableName" => "CustomerID", "ControlHTML" => '<div id="CustomerID_Wrap" ><label style="margin-left: -197px;margin-top: -9px;" class="control-label">Select Customer</label>' . CCTL_Customer($Name = "CustomerID", $ValueSelected = $TheEntityName["CustomerID"], $Where = "", $PrependBlankOption = true) . '</div>');
-$Input[] = array("VariableName" => "VendorID", "Caption" => "Vendor", "ControlHTML" => CCTL_Vendor($Name = "VendorID", $TheEntityName["VendorID"], $Where = "", $PrependBlankOption = true));
+
 $Input[] = array("VariableName" => "ContructorID", "Caption" => "Contructor", "ControlHTML" => CCTL_Contructor($Name = "ContructorID", $TheEntityName["ContructorID"] , $Where = "", $PrependBlankOption = true));
 $Input[] = array("VariableName" => "CustomerID", "Caption" => "Customer Name", "ControlHTML" => CCTL_Customer($Name = "CustomerID", $ValueSelected = $TheEntityName["CustomerID"], $Where = "", $PrependBlankOption = true));
 
@@ -60,20 +86,35 @@ $Input[] = array("VariableName" => "FormProjectID", "Caption" => "Project Name",
 $Input[] = array("VariableName" => "BankCashID", "Caption" => "Cash Type", "ControlHTML" => CCTL_BankCash($Name = "BankCashID", $TheEntityName["BankCashID"], $Where = "", $PrependBlankOption = false));
 $Input[] = array("VariableName" => "checkNumberArea", "Caption" => "Cheque Number", "ControlHTML" => '<input class="form-control form-control-lg" type="text" id="ChequeNumber" name="ChequeNumber" value="' . htmlspecialchars($TheEntityName["ChequeNumber"]) . '" size="30" class="" >');
 
-$Input[] = array("VariableName" => "FormHeadOfAccountID3", "Caption" => "Division", "ControlHTML" => '
-                      <select class="form-select" id="division" name="Division">
-                            <option value="" disabled '.$DivisionSelect.'>Select a division</option>
-                            <option value="'.$TheEntityName["Division"].'" '.$DivisionSelect2.' >'.$TheEntityName["Division"].'</option>
-                                <option value="Corporate">Corporate</option>
-                                <option value="SSD">SSD</option>
-                                <option value="SED">SED</option>
-                                <option value="CST">CST</option>
-                                <option value="Founder">Founder</option>
-                                <option value="Referral">Referral</option>
-                                <option value="Director">Director</option>
-                        </select>
-');
+$Settings = SQL_Select("Settings", "", "", true);
+$Divitions = explode(",", $Settings["Division"]);//Array ( [0] => Corporate [1] => Director [2] => SSD [3] => CSD [4] => new )
+$DivitionList = array();
+foreach ($Divitions as $Divition) {
+    $DivitionList[] = array(
+        "value" => $Divition,
+        "text" => $Divition
+    );
+}
+$Input[] = array("VariableName" => "Division", "Caption" => "Division", "ControlHTML" => '
+<select class="form-select" name="Division" id="Division">
+    <option value="" disabled selected>Select Division</option>' .
+    implode('', array_map(function($option) use ($TheEntityName) {
+        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["Division"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+    }, $DivitionList)) .
+'</select>');
+
 $GroupTransations = SQL_Select("drVoucher", "VoucherNo = '{$TheEntityName['VoucherNo']}'");
+$Head = SQL_Select("expensehead", "ExpenseHeadIsActive = 1");
+$HeadOfAccountID = array();
+foreach ($Head as $HeadOfAccount) {
+    $HeadOfAccountID[] = array(
+        "value" => $HeadOfAccount["ExpenseHeadID"],
+        "text" => $HeadOfAccount["ExpenseHeadName"]
+    );
+}
+
+
+
 
 if (count($GroupTransations) > 1) {
     $Add = true;
@@ -92,8 +133,14 @@ if (count($GroupTransations) > 1) {
             "Caption" => "Head Of Account & Amount",
             "ControlHTML" => '
         <div class="account-amount-group row mb-2">
-            <div class="col-12 col-md-6 mb-2 mb-md-0">' .
-                GetExpenseID("HeadOfAccountID[]", "{$GroupTransation['HeadOfAccountID']}", "", true) . '
+            <div class="col-12 col-md-6 mb-2 mb-md-0">         
+               <select class="form-select" name="HeadOfAccountID[]" required>
+                    <option value="" disabled selected>Select Head Of Account</option>' .
+                    implode('', array_map(function($option) use ($GroupTransation) {
+                        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($GroupTransation['HeadOfAccountID'] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+                    }, $HeadOfAccountID)) .
+                '</select>
+                
             </div>
             <div class="col-6 col-md-3 mb-2 mb-md-0">
                 <input type="text" name="Amount[]" value="' . htmlspecialchars($GroupTransation["Amount"]) . '" size="5" class="form-control required" required>
@@ -137,93 +184,68 @@ $MainContent .= FormInsertUpdate(
     $ActionURL
 );
 
-//for ($i = 102; $i <= 104; $i++) {
-//    $MainContent .= 'div#Control_' . $i . ' {
-//        display: none;
-//    }';
-//}VendorID
-
-$MainContent .= <<<EOD
-        <script>
-            $(document).ready(function() {
-                $(document).on('click', '.btn-add', function() {
-                    var group = $(this).closest('.account-amount-group');
-                    var newGroup = group.clone();
-            
-                    // Change + to -
-                    newGroup.find('.btn-add')
-                        .removeClass('btn-success btn-add')
-                        .addClass('btn-danger btn-remove')
-                        .html('<i class="glyphicon glyphicon-minus"> - </i>');
-                    newGroup.find('select').val('');
-                    newGroup.find('input').val('');
-                    $('.account-amount-group').last().after(newGroup);
-                });
-                $(document).on('click', '.btn-remove', function() {
-                    $(this).closest('.account-amount-group').remove();
-                });
-            });
-        </script>
-       
-
+$MainContent .= "
+<script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
 <script>
     $(document).ready(function() {
-        function toggleFields() {
-            var selectedValue = $("#MyType").val();
+        $(document).on('click', '.btn-add', function() {
+            var group = $(this).closest('.account-amount-group');
+            var newGroup = group.clone();
 
-            // First hide and reset all
-            [102, 103, 104].forEach(function(id) {
-                $("#Control_" + id).hide();
-                $("#Control_" + id + " :input").val(''); // Reset all input fields inside
-            });
+            newGroup.find('.btn-add')
+                .removeClass('btn-success btn-add')
+                .addClass('btn-danger btn-remove')
+                .html('<i class=\"glyphicon glyphicon-minus\"> - </i>');
+            newGroup.find('select').val('');
+            newGroup.find('input').val('');
+            $('.account-amount-group').last().after(newGroup);
+        });
 
-            // Now show the selected one
-            if (selectedValue == "1") {
-                $("#Control_103").show();
-            } else if (selectedValue == "2") {
-                $("#Control_102").show();
-            } else if (selectedValue == "3") {
-                $("#Control_104").show();
-            } 
+        $(document).on('click', '.btn-remove', function() {
+            $(this).closest('.account-amount-group').remove();
+        });
+
+
+
+    var select = document.getElementById('MyType');
+
+    select.addEventListener('change', function () {
+        var selectedValue = this.value;
+
+        document.getElementById('Control_102').style.display = 'none';
+        document.getElementById('Control_103').style.display = 'none';
+        document.getElementById('Control_104').style.display = 'none';
+
+        if (selectedValue === '1') {
+            document.getElementById('Control_103').style.display = 'block';
+        } else if (selectedValue === '2') {
+            document.getElementById('Control_102').style.display = 'block';
+        } else if (selectedValue === '3') {
+            document.getElementById('Control_104').style.display = 'block';
         }
+    });
 
-        toggleFields();
+    select.dispatchEvent(new Event('change'));
 
-        $("#MyType").change(function() {
-            toggleFields();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('basic_validate').removeAttribute('novalidate');
+
+        const selectElements = document.querySelectorAll('select[name=\"HeadOfAccountID[]\"]');
+
+        selectElements.forEach(function(select) {
+            select.setAttribute('required', 'required');
+            select.classList.add('ProjectNameClass');
+        });
+
+        const selectElementsProject = document.querySelectorAll('.ProjectNameClass');
+
+        selectElementsProject.forEach(function(select) {
+            select.setAttribute('required', 'required');
         });
     });
 </script>
+";
 
-
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-        <script>
-            $(document).ready(function() {
-              //  $("#HeadOfAccountID").select2();
-              //  $(".FormComboBoxCustomer").select2();
-                
-            });   
-        </script>
-        
-        <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
-            // Remove novalidate  from the form
-            document.getElementById("basic_validate").removeAttribute("novalidate");
-
-            const selectElements = document.querySelectorAll("select[name=\'HeadOfAccountID[]\']");
-
-            selectElements.forEach(function(select) {
-                select.setAttribute("required", "required");
-                select.classList.add("ProjectNameClass");
-            });
-
-            const selectElementsProject = document.querySelectorAll(".ProjectNameClass");
-
-            selectElementsProject.forEach(function(select) {
-                select.setAttribute("required", "required");
-            });
-        });
-    </script>
-EOD;
 ?>
