@@ -115,7 +115,7 @@ $sale = SQL_Select("Sales", "SalesID = {$salesID} AND CustomerID = {$customerID}
 
 // Sale dropdown
 $saleOptions = '<select id="SaleID" name="SaleID" class="form-select">';
-$saleOptions .= '<option value="0">-- Select Sale --</option>';
+$saleOptions .= '<option value="'.isset($TheEntityName["SaleID"])?$TheEntityName["SaleID"]:0.'"'.isset($TheEntityName["SaleID"])?$TheEntityName["SaleID"]:'>-- Select Sale. --</option>';
 if ($UpdateMode && $TheEntityName["Type"] == 1 && !empty($TheEntityName["SaleID"])) {
     $saleOptions .= '<option value="' . htmlspecialchars($TheEntityName["SaleID"]) . '" selected>' . 
                     htmlspecialchars($TheEntityName["SaleID"]) . '</option>';
@@ -240,15 +240,12 @@ $MainContent .= '
                     console.log("Type changed to: " + type);
                 }
             }
+        
             
-            // Handle customer change - load sales
             $(document).on("change", "select[name=\'CustomerID\']", function() {
                 var customerId = $(this).val();
-                // $TheEntityName["SaleID"]
-                var saleIDX =  $TheEntityName["SaleID"];
-                console.log("Sale changed to ID: " + saleIDX); // rs
                 console.log("Customer changed to ID: " + customerId); // Debugging line
-                //SaleIDX for seleted s
+
                 var $saleSelect = $("select[name=\'SaleID\']");
                 
                 if (customerId > 0) {
@@ -265,7 +262,8 @@ $MainContent .= '
                             console.log("Received sales data:", data); // Debugging line
                             $saleSelect.empty().append("<option value=\'0\'>Select Sale</option>");
                             
-                            if (data && data.length > 0 && saleIDX > 0) {
+                            if (data && data.length > 0) {
+                                
                                 $.each(data, function(index, sale) {
                                     $saleSelect.append($("<option></option>")
                                         .attr("value", sale.SalesID)
@@ -327,9 +325,9 @@ $MainContent .= '
             $("#TypeSelector").on("change", toggleFieldsByType);
             
             // Trigger change if customer is pre-selected (edit mode)
-            if ($("select[name=\'CustomerID\']").val() > 0) {
-                $("select[name=\'CustomerID\']").trigger("change");
-            }
+            // if ($("select[name=\'CustomerID\']").val() > 0) {
+            //     $("select[name=\'CustomerID\']").trigger("change");
+            // }
         });
 
         var select = document.getElementById("TypeSelector"); 
