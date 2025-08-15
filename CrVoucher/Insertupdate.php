@@ -106,37 +106,31 @@ $Input[] = array(
     "RowAttributes" => $customerFieldsStyle
 );
 
+// Sanitize and validate inputs
+$salesID = isset($TheEntityName["SalesID"]) ? intval($TheEntityName["SalesID"]) : 0;
+$customerID = isset($TheEntityName["CustomerID"]) ? intval($TheEntityName["CustomerID"]) : 0;
+$productID = isset($TheEntityName["ProductsID"]) ? intval($TheEntityName["ProductsID"]) : 0;
 
-$SaleSx = SQL_Select(
-    "Sales", 
-    "CustomerID = '{$TheEntityName["CustomerID"]}' AND ProductID = '{$TheEntityName["ProductsID"]}'"
-);
+$sale = SQL_Select("Sales", "SalesID = {$salesID} AND CustomerID = {$customerID} AND ProductID = {$productID}", "", true);
 
-// Sale ID dropdown
-$saleOptions = '<select name="SaleID" id="SaleID" class="form-select form-control">
-<option value="">-- Select Sale --</option>';
-
-if ($TheEntityName["Type"] == 1 && !empty($TheEntityName["CustomerID"])) {
-            $SaleSx = SQL_Select("Sales", "CustomerID =  " . $TheEntityName["CustomerID"]);
-            $sale = SQL_Select("Sales", "CustomerID =  " . $TheEntityName["CustomerID"]);
-            $selected = ($sale[0]["SalesID"] == $SaleSx[0]["SalesID"]) ? 'selected' : '';
-            $saleOptions .= '<option value="' . $sale[0]["SalesID"] . '" ' . $selected . '>' . $sale[0]["SalesID"] . '</option>';
-
-    // $sale = SQL_Select("Sales", "CustomerID = " . intval($TheEntityName["CustomerID"])). " AND ProductID = " . intval($TheEntityName["ProductsID"]);
-    // if (!empty($sale)) {
-    //     foreach ($sale as $row) {
-    //         $selected = ($row["SalesID"] == $SaleSx[0]["SalesID"]) ? 'selected' : '';
-    //         $saleOptions .= '<option value="' . $row["SalesID"] . '" ' . $selected . '>' . $row["SalesID"] . '</option>';
-    //     }
-    // }
+// Sale dropdown
+$saleOptions = '<select id="SaleID" name="SaleID" class="form-select">';
+$saleOptions .= '<option value="0">-- Select Sale --</option>';
+if ($UpdateMode && $TheEntityName["Type"] == 1 && !empty($TheEntityName["SaleID"])) {
+    $saleOptions .= '<option value="' . htmlspecialchars($TheEntityName["SaleID"]) . '" selected>' . 
+                    htmlspecialchars($TheEntityName["SaleID"]) . '</option>';
+} elseif ($UpdateMode && !empty($sale)) {
+    $saleOptions .= '<option value="' . htmlspecialchars($sale["SalesID"]) . '" selected>' . 
+                    htmlspecialchars($sale["SalesID"]) . '</option>';
 }
+
 $saleOptions .= '</select>';
 
 $Input[] = array(
     "VariableName" => "SaleID",
     "Caption" => "Sale ID",
     "ControlHTML" => $saleOptions,
-    "RowAttributes" => isset($customerFieldsStyle) ? $customerFieldsStyle : ""
+    "RowAttributes" => $customerFieldsStyle
 );
 
 
@@ -250,8 +244,11 @@ $MainContent .= '
             // Handle customer change - load sales
             $(document).on("change", "select[name=\'CustomerID\']", function() {
                 var customerId = $(this).val();
+                // $TheEntityName["SaleID"]
+                var saleIDX =  $TheEntityName["SaleID"];
+                console.log("Sale changed to ID: " + saleIDX); // rs
                 console.log("Customer changed to ID: " + customerId); // Debugging line
-                
+                //SaleIDX for seleted s
                 var $saleSelect = $("select[name=\'SaleID\']");
                 
                 if (customerId > 0) {
@@ -268,7 +265,7 @@ $MainContent .= '
                             console.log("Received sales data:", data); // Debugging line
                             $saleSelect.empty().append("<option value=\'0\'>Select Sale</option>");
                             
-                            if (data && data.length > 0) {
+                            if (data && data.length > 0 && saleIDX > 0) {
                                 $.each(data, function(index, sale) {
                                     $saleSelect.append($("<option></option>")
                                         .attr("value", sale.SalesID)

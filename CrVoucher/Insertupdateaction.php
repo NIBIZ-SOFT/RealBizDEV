@@ -64,7 +64,7 @@ if($ErrorUserInput["_Error"]){
 
             "Description" => $_POST["Description"],
             "Type" => $_POST["Type"],
-            "SalesID" => $_REQUEST["SaleID"],
+            "SaleID" => $_REQUEST["SaleID"],
 
             "Name" => $_POST["Name"],
             "CustomerID" => $_POST["CustomerID"],
@@ -208,7 +208,6 @@ if($ErrorUserInput["_Error"]){
         SQL_Delete("transaction where VoucherNo = '{$voucherNo}' and VoucherType ='CV' ");
         SQL_Delete("Actualsalsepayment where MRRNO = '{$voucherNo}'");
     }
-    print_r($_POST["CrVoucherIsDisplay"]);
 
 
 

@@ -28,6 +28,19 @@ if (isset($_REQUEST[$Entity . "ID"]) && isset($_REQUEST[$Entity . "UUID"]) && !i
     }
 }
 
+$Settings = SQL_Select("Settings", "", "", true);
+$Divitions = explode(",", $Settings["Division"]);
+$DivitionList = array();
+foreach ($Divitions as $Divition) {
+    $DivitionList[] = array(
+        "value" => $Divition,
+        "text" => $Divition
+    );
+}
+
+
+print_r($TheEntityName['Division']);
+
 $MainContent .= '
 <div class="card">
     <div class="card-header">
@@ -39,13 +52,11 @@ $MainContent .= '
                 <div class="col-md-4">
                     <label class="form-label">Division</label>
                     <select id="division" name="Division" class="form-select">
-                        <option value="">Select a division</option>
-                        <option value="Corporate" ' . ($TheEntityName["Division"] == "Corporate" ? "selected" : "") . '>Corporate</option>
-                        <option value="SSD" ' . ($TheEntityName["Division"] == "SSD" ? "selected" : "") . '>SSD</option>
-                        <option value="SED" ' . ($TheEntityName["Division"] == "SED" ? "selected" : "") . '>SED</option>
-                        <option value="CST" ' . ($TheEntityName["Division"] == "CST" ? "selected" : "") . '>CST</option>
-                        <option value="Founder" ' . ($TheEntityName["Division"] == "Founder" ? "selected" : "") . '>Founder</option>
-                        <option value="Referral" ' . ($TheEntityName["Division"] == "Referral" ? "selected" : "") . '>Referral</option>
+                        <option value="" disabled selected>Select Division</option>' .
+                        implode('', array_map(function($option) use ($TheEntityName) {
+                            return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["Division"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+                        }, $DivitionList)) .
+                        '</select>
                     </select>
                 </div>
 
