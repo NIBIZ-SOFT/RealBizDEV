@@ -115,13 +115,11 @@ $sale = SQL_Select("Sales", "SalesID = {$salesID} AND CustomerID = {$customerID}
 
 // Sale dropdown
 $saleOptions = '<select id="SaleID" name="SaleID" class="form-select">';
-
 if ($saleID) {
     $saleOptions .= '<option value="' . $saleID . '">' . $saleID . '</option>';
 } else {
     $saleOptions .= '<option value="0">-- Select Sale. --</option>';
 }
-
 if ($UpdateMode && $TheEntityName["Type"] == 1 && !empty($TheEntityName["SaleID"])) {
     $saleOptions .= '<option value="' . htmlspecialchars($TheEntityName["SaleID"]) . '" selected>' . 
                     htmlspecialchars($TheEntityName["SaleID"]) . '</option>';
@@ -331,9 +329,9 @@ $MainContent .= '
             $("#TypeSelector").on("change", toggleFieldsByType);
             
             // Trigger change if customer is pre-selected (edit mode)
-            // if ($("select[name=\'CustomerID\']").val() > 0) {
-            //     $("select[name=\'CustomerID\']").trigger("change");
-            // }
+            if ($("select[name=\'CustomerID\']").val() > 0) {
+                $("select[name=\'CustomerID\']").trigger("change");
+            }
         });
 
         var select = document.getElementById("TypeSelector"); 
