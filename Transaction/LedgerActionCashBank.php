@@ -170,7 +170,7 @@ foreach ($Categories as $Category) {
                 <div class="text-center">
                     <h3>' . htmlspecialchars($bankDisplayName) . '</h3>
                 </div>
-                <h6 class="text-center">Opening Balance: ' . BangladeshiCurencyFormat($opBalance) . ' | Closing Balance: ' . BangladeshiCurencyFormat($cbBalance) . '</h6>
+                <h6 style="display: none" class="text-center">Opening Balance: ' . BangladeshiCurencyFormat($opBalance) . ' | Closing Balance: ' . BangladeshiCurencyFormat($cbBalance) . '</h6>
                 <table class="table table-hover table-sm table-bordered">
                     <thead>
                     <tr style=" display: none; background: #3F51B5; color: #ffffff; font-weight: bold; font-size: 20px; ">

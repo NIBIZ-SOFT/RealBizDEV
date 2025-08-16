@@ -39,8 +39,9 @@ foreach ($Divitions as $Divition) {
 }
 
 
-print_r($TheEntityName['Division']);
-
+// print_r($TheEntityName['Division']);
+$ProductNamex = SQL_Select("Products", "ProductsID = '" . $TheEntityName["ProductID"] . "'", "", true);
+print_r($ProductNamex);
 $MainContent .= '
 <div class="card">
     <div class="card-header">
@@ -76,7 +77,7 @@ $MainContent .= '
                     <label class="form-label">Product</label>
                     <select name="ProductID" id="ProductID" class="form-select" required>
                         <option value="">-- Select Product --</option>
-                        <option value="' . $TheEntityName["ProductID"] . '" selected>' . $TheEntityName["ProductName"] . '</option>
+                        <option value="' . $TheEntityName["ProductID"] . '" selected>' . $ProductNamex["floorNumber"] . "-" . $ProductNamex["FlatType"] . '</option>
                     </select>
                     <input type="hidden" name="ProductName" id="HideProductName" value="' . $TheEntityName["ProductName"] . '">
                 </div>
