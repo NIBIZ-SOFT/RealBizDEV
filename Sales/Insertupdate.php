@@ -41,7 +41,7 @@ foreach ($Divitions as $Divition) {
 
 // print_r($TheEntityName['Division']);
 $ProductNamex = SQL_Select("Products", "ProductsID = '" . $TheEntityName["ProductID"] . "'", "", true);
-print_r($ProductNamex);
+// print_r($ProductNamex);
 $MainContent .= '
 <div class="card">
     <div class="card-header">
