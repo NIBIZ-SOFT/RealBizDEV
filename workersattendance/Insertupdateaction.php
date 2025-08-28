@@ -58,7 +58,7 @@ for ($i = 0; $i < count($worker_ids); $i++) {
             "date"              => $date,
             "status"            => $status,
             "work_hours"        => $work_hr,
-            "amount"            => $amount,
+            "amount"            => $amount * $work_hr,
             "remarks"           => $remark,
             "{$Entity}IsActive" => 1,
         ),
@@ -77,7 +77,7 @@ for ($i = 0; $i < count($worker_ids); $i++) {
         array(
             "worker_id"            => $worker_id,
             "date"                 => $date,
-            "wage_per_day"         => $amount,
+            "wage_per_day"         => $amount * $work_hr,
             "status"               => $remark,
             "is_generated"         => 1,
             "payable_logsIsActive" => 1,
