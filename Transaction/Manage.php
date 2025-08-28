@@ -166,7 +166,7 @@ $MainContent .= CTL_Datagrid(
 
 // // ========= if Transaction Table VoucherNo Null OR  voucher Type Null =========
 
-$Transaction = SQL_Select("transaction");
+// $Transaction = SQL_Select("transaction");
 
 // foreach ($Transaction as $key => $value) {
 //     $voucherNo = isset($value['VoucherNo']) ? trim($value['VoucherNo']) : '';
