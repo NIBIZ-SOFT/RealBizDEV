@@ -119,7 +119,7 @@ $MainContent .= CTL_Datagrid(
 //         $C = SQL_Select("crVoucher where CrVoucherID = $voucherID");
 //         print_r($C);
 //     }
-}
+// }
 
 // // DV
 // $Drvoucher = SQL_Select("drvoucher", "DrVoucherIsDisplay = 0");
