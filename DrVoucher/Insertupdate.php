@@ -22,24 +22,24 @@ if (isset($_REQUEST[$Entity . "ID"]) && isset($_REQUEST[$Entity . "UUID"]) && !i
     $UpdateMode = true;
     $FormTitle = "Update $EntityCaption";
     $ButtonCaption = "Update";
-    $ActionURL = ApplicationURL("{$_REQUEST["Base"]}", "Insertupdateaction", $Entity . "ID={$_REQUEST[$Entity."ID"]}&" . $Entity . "UUID={$_REQUEST[$Entity."UUID"]}");
-    if ($UpdateMode && !isset($_POST["" . $Entity . "ID"])) $TheEntityName = SQL_Select($Entity = "{$Entity}", $Where = "{$Entity}ID = {$_REQUEST[$Entity."ID"]} AND {$Entity}UUID = '{$_REQUEST[$Entity."UUID"]}'", $OrderBy = "{$OrderByValue}", $SingleRow = true);
+    $ActionURL = ApplicationURL("{$_REQUEST["Base"]}", "Insertupdateaction", $Entity . "ID={$_REQUEST[$Entity . "ID"]}&" . $Entity . "UUID={$_REQUEST[$Entity . "UUID"]}");
+    if ($UpdateMode && !isset($_POST["" . $Entity . "ID"])) $TheEntityName = SQL_Select($Entity = "{$Entity}", $Where = "{$Entity}ID = {$_REQUEST[$Entity . "ID"]} AND {$Entity}UUID = '{$_REQUEST[$Entity . "UUID"]}'", $OrderBy = "{$OrderByValue}", $SingleRow = true);
 
-    $ContructorID="";
-    if ($TheEntityName["Type"]==1){
-        $ContructorID= "selected";
+    $ContructorID = "";
+    if ($TheEntityName["Type"] == 1) {
+        $ContructorID = "selected";
     }
-    $VendorID="";
-    if ($TheEntityName["Type"]==2){
-        $VendorID= "selected";
+    $VendorID = "";
+    if ($TheEntityName["Type"] == 2) {
+        $VendorID = "selected";
     }
-    $OperationCost="";
-    if ($TheEntityName["Type"]==4){
-        $OperationCost= "selected";
+    $OperationCost = "";
+    if ($TheEntityName["Type"] == 4) {
+        $OperationCost = "selected";
     }
-    $CustomerSelect="";
-    if ($TheEntityName["Type"]==3){
-        $CustomerSelect= "selected";
+    $CustomerSelect = "";
+    if ($TheEntityName["Type"] == 3) {
+        $CustomerSelect = "selected";
     }
 }
 
@@ -67,18 +67,18 @@ $MainContent = '<style>
 
 
 $Input = array();
-$Input[] = array("VariableName" => "Type", "Caption" => "Type", "ControlHTML" => '<select class="form-select" name="Type" id="MyType"><option value="0">Select Type</option><option '.$ContructorID.' value="1">Contructor</option><option '.$VendorID.' value="2">Vendor</option><option '.$CustomerSelect.' value="3">Customer</option><option '.$OperationCost.' value="4">Operation Cost/Others</option></select>');
-                
+$Input[] = array("VariableName" => "Type", "Caption" => "Type", "ControlHTML" => '<select class="form-select" name="Type" id="MyType"><option value="0">Select Type</option><option ' . $ContructorID . ' value="1"> ID:1 - Contructor</option><option ' . $VendorID . ' value="2">ID:2 - Vendor</option><option ' . $CustomerSelect . ' value="3">ID:3 - Customer</option><option ' . $OperationCost . ' value="4">ID:4 - Operation Cost/Others</option></select>');
+
 $Input[] = array("VariableName" => "VendorID", "Caption" => "Vendor", "ControlHTML" => '
 <select class="form-select" name="VendorID" id="">
-<option value="" disabled ' . $VendorSelect . '>Select a vendor</option>' .
-    implode('', array_map(function($option) use ($TheEntityName) {
-        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["VendorID"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+<option value="" ' . $VendorSelect . '>Select a vendor</option>' .
+    implode('', array_map(function ($option) use ($TheEntityName) {
+        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["VendorID"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['value'] . " - " . $option['text']) . '</option>';
     }, $VendorList)) .
-'</select>');
+    '</select>');
 
 
-$Input[] = array("VariableName" => "ContructorID", "Caption" => "Contructor", "ControlHTML" => CCTL_Contructor($Name = "ContructorID", $TheEntityName["ContructorID"] , $Where = "", $PrependBlankOption = true));
+$Input[] = array("VariableName" => "ContructorID", "Caption" => "Contructor", "ControlHTML" => CCTL_Contructor($Name = "ContructorID", $TheEntityName["ContructorID"], $Where = "", $PrependBlankOption = true));
 $Input[] = array("VariableName" => "CustomerID", "Caption" => "Customer Name", "ControlHTML" => CCTL_Customer($Name = "CustomerID", $ValueSelected = $TheEntityName["CustomerID"], $Where = "", $PrependBlankOption = true));
 
 
@@ -86,8 +86,30 @@ $Input[] = array("VariableName" => "FormProjectID", "Caption" => "Project Name",
 $Input[] = array("VariableName" => "BankCashID", "Caption" => "Cash Type", "ControlHTML" => CCTL_BankCash($Name = "BankCashID", $TheEntityName["BankCashID"], $Where = "", $PrependBlankOption = false));
 $Input[] = array("VariableName" => "checkNumberArea", "Caption" => "Cheque Number", "ControlHTML" => '<input class="form-control form-control-lg" type="text" id="ChequeNumber" name="ChequeNumber" value="' . htmlspecialchars($TheEntityName["ChequeNumber"]) . '" size="30" class="" >');
 
+
+// $Vendor = SQL_Select("vendor ");
+// $VendorList = array();
+// foreach ($Vendor as $VendorItem) {
+//     $VendorList[] = array(
+//         "value" => $VendorItem["VendorID"],
+//         "text" => $VendorItem["VendorName"]
+//     );
+// }
+// $Input[] = array("VariableName" => "VendorID", "Caption" => "Vendor", "ControlHTML" => '
+// <select class="form-select" name="VendorID" id="">
+// <option value="" disabled ' . $VendorSelect . '>Select a vendor</option>' .
+//     implode('', array_map(function ($option) use ($TheEntityName) {
+//         return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["VendorID"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+//     }, $VendorList)) .
+//     '</select>');
+
+
+
+
+
+
 $Settings = SQL_Select("Settings", "", "", true);
-$Divitions = explode(",", $Settings["Division"]);//Array ( [0] => Corporate [1] => Director [2] => SSD [3] => CSD [4] => new )
+$Divitions = explode(",", $Settings["Division"]); //Array ( [0] => Corporate [1] => Director [2] => SSD [3] => CSD [4] => new )
 $DivitionList = array();
 foreach ($Divitions as $Divition) {
     $DivitionList[] = array(
@@ -98,11 +120,10 @@ foreach ($Divitions as $Divition) {
 $Input[] = array("VariableName" => "Division", "Caption" => "Division", "ControlHTML" => '
 <select class="form-select" name="Division" id="Division">
     <option value="" disabled selected>Select Division</option>' .
-    implode('', array_map(function($option) use ($TheEntityName) {
+    implode('', array_map(function ($option) use ($TheEntityName) {
         return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($TheEntityName["Division"] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
     }, $DivitionList)) .
-'</select>');
-
+    '</select>');
 $GroupTransations = SQL_Select("drVoucher", "VoucherNo = '{$TheEntityName['VoucherNo']}'");
 $Head = SQL_Select("expensehead", "ExpenseHeadIsActive = 1");
 $HeadOfAccountID = array();
@@ -112,9 +133,6 @@ foreach ($Head as $HeadOfAccount) {
         "text" => $HeadOfAccount["ExpenseHeadName"]
     );
 }
-
-
-
 
 if (count($GroupTransations) > 1) {
     $Add = true;
@@ -127,7 +145,7 @@ if (count($GroupTransations) > 1) {
         } else {
             $ButtonHTML = '<button type="button" class="btn btn-danger btn-remove"><i class="glyphicon glyphicon-minus">-</i></button>';
         }
-//echo $GroupTransation['HeadOfAccountID'];
+        //echo $GroupTransation['HeadOfAccountID'];
         $Input[] = array(
             "VariableName" => "AccountAmountGroup",
             "Caption" => "Head Of Account & Amount",
@@ -136,14 +154,14 @@ if (count($GroupTransations) > 1) {
             <div class="col-12 col-md-6 mb-2 mb-md-0">         
                <select class="form-select" name="HeadOfAccountID[]" required>
                     <option value="" disabled selected>Select Head Of Account</option>' .
-                    implode('', array_map(function($option) use ($GroupTransation) {
-                        return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($GroupTransation['HeadOfAccountID'] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
-                    }, $HeadOfAccountID)) .
+                implode('', array_map(function ($option) use ($GroupTransation) {
+                    return '<option value="' . htmlspecialchars($option['value']) . '" ' . ($GroupTransation['HeadOfAccountID'] == $option['value'] ? 'selected' : '') . '>' . htmlspecialchars($option['text']) . '</option>';
+                }, $HeadOfAccountID)) .
                 '</select>
                 
             </div>
             <div class="col-6 col-md-3 mb-2 mb-md-0">
-                <input type="text" name="Amount[]" value="' . htmlspecialchars($GroupTransation["Amount"]) . '" size="5" class="form-control required" required>
+                <input type="number" name="Amount[]" value="' . htmlspecialchars($GroupTransation["Amount"]) . '" size="5" class="form-control required" required>
             </div>
             <div class="col-6 col-md-3">
                 ' . $ButtonHTML . '
@@ -151,7 +169,7 @@ if (count($GroupTransations) > 1) {
         </div>'
         );
     }
-}else{
+} else {
     $Input[] = array(
         "VariableName" => "AccountAmountGroup",
         "Caption" => "Head Of Account & Amount",
@@ -161,7 +179,7 @@ if (count($GroupTransations) > 1) {
             GetExpenseID("HeadOfAccountID[]", "{$TheEntityName['HeadOfAccountID']}", "", true) . '
             </div>
             <div class="col-6 col-md-3 mb-2 mb-md-0">
-                <input type="text" name="Amount[]" value="' . htmlspecialchars($TheEntityName["Amount"]) . '" size="5" class="form-control required" required>
+                <input type="number" name="Amount[]" value="' . htmlspecialchars($TheEntityName["Amount"]) . '" size="5" class="form-control required" required>
             </div>
             <div class="col-6 col-md-3">
                 <button type="button" class="btn btn-success btn-add"><i class="glyphicon glyphicon-plus">+</i></button>
@@ -173,7 +191,7 @@ if (count($GroupTransations) > 1) {
 
 $Input[] = array("VariableName" => "BillNo", "Caption" => "M.R/Bill No", "ControlHTML" => CTL_InputText($Name = "BillNo", $TheEntityName["BillNo"], "", 30, ""));
 $Input[] = array("VariableName" => "Date", "Caption" => "Date", "ControlHTML" => '<div class="input-group mb-3"><input class="form-control" type="date" id="Date" name="Date" value="' . htmlspecialchars($TheEntityName["Date"], ENT_QUOTES, 'UTF-8') . '" size="30" class="required" required></div>');
-$Input[] = array("VariableName" => "Description", "Caption" => "Particulars", "ControlHTML" => CTL_InputTextArea("Description", $TheEntityName["Description"], "", 5, ""). '<input name="VoucherNo" type="hidden" value="' . $TheEntityName["VoucherNo"] . '" />');
+$Input[] = array("VariableName" => "Description", "Caption" => "Particulars", "ControlHTML" => CTL_InputTextArea("Description", $TheEntityName["Description"], "", 5, "") . '<input name="VoucherNo" type="hidden" value="' . $TheEntityName["VoucherNo"] . '" />');
 $Input[] = array("VariableName" => "ProductsImage", "Caption" => "Image", "ControlHTML" => CTL_ImageUpload($ControlName = "Image", $CurrentImage01 = $TheEntityName["Image"], $AllowDelete = true, $Class = "FormTextInput", $ThumbnailHeight = 100, $ThumbnailWidth = 0, $Preview = true));
 $Input[] = array("VariableName" => "IsDisplay", "Caption" => "Confirm?", "ControlHTML" => CTL_InputRadioSet($VariableName = "{$Entity}IsDisplay", $Captions = array("No", "Yes"), $Values = array(1, 0), $CurrentValue = $TheEntityName["{$Entity}IsDisplay"]), "Required" => false);
 $MainContent .= FormInsertUpdate(
@@ -247,5 +265,3 @@ $MainContent .= "
     });
 </script>
 ";
-
-?>

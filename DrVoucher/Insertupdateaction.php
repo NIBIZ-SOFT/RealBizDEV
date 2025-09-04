@@ -8,7 +8,7 @@ $ErrorUserInput["_Error"] = false;
 
 if (!$UpdateMode) $_REQUEST["{$Entity}ID"] = 0;
 //some change goes here
-$TheEntityName = SQL_Select($Entity = "{$Entity}", $Where = "{$UniqueField} = '{$_POST["{$UniqueField}"]}' AND {$Entity}ID <> {$_REQUEST[$Entity."ID"]}");
+$TheEntityName = SQL_Select($Entity = "{$Entity}", $Where = "{$UniqueField} = '{$_POST["{$UniqueField}"]}' AND {$Entity}ID <> {$_REQUEST[$Entity . "ID"]}");
 if (count($TheEntityName) > 0) {
     $ErrorUserInput["_Error"] = true;
     $ErrorUserInput["_Message"] = "This Value Already Taken.";
@@ -25,12 +25,12 @@ if ($ErrorUserInput["_Error"]) {
         $voucherNo = null;
     }
 
-// --- DELETE transaction ONCE before loop ---
+    // --- DELETE transaction ONCE before loop ---
     if ($_POST["{$Entity}IsDisplay"] == 0 ||  $_POST["{$Entity}IsDisplay"] == 1 && !empty($voucherNo)) {
         SQL_Delete("transaction where VoucherNo = '{$voucherNo}' and VoucherType ='DV' ");
     }
 
-// --- Now start the foreach loop ---
+    // --- Now start the foreach loop ---
     foreach ($_POST['HeadOfAccountID'] as $index => $headID) {
         $amount = $_POST['Amount'][$index];
 
@@ -142,7 +142,8 @@ if ($ErrorUserInput["_Error"]) {
                 )
             );
             if (!$result) {
-                echo "Transaction Insert Failed!"; exit;
+                echo "Transaction Insert Failed!";
+                exit;
             }
         }
     }
@@ -158,4 +159,3 @@ if ($ErrorUserInput["_Error"]) {
 	        </script>
 		";
 }
-?>

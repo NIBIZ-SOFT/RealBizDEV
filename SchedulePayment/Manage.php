@@ -312,7 +312,7 @@ if (empty($allScheduleDetails)) {
 <h4 style="margin-top:20px;" class="text-center">Actual Received Management (' . $customerName . ' || ' . $ProjectName . ' || ' . $ProductName . ')</h4>
 
 
-<a style="margin-top:45px;" class="btn btn-success pull-right" style="margin-bottom:5px;" href="' . ApplicationURL("SchedulePayment", "AddActualPayment&SalesID={$_GET["SalesID"]}") . '">Add Payment</a> 
+<a style="margin-top:45px; display:none" class="btn btn-success pull-right" style="margin-bottom:5px;" href="' . ApplicationURL("SchedulePayment", "AddActualPayment&SalesID={$_GET["SalesID"]}") . '">Add Payment</a> 
 
 <table  class="table table-bordered">
 	
