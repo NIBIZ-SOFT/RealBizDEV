@@ -1,272 +1,128 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: NiBiZ Soft
- * Date: 5/2/2019
- * Time: 3:09 PM
- */
-
 $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
 
-$FromDate = isset($_REQUEST["FromDate"]) && strtotime($_REQUEST["FromDate"]) ? $_REQUEST["FromDate"] : '2000-01-01';
-$ToDate = isset($_REQUEST["ToDate"]) && strtotime($_REQUEST["ToDate"]) ? $_REQUEST["ToDate"] : '3000-01-01';
+$FromDate   = isset($_REQUEST["FromDate"])   ? $_REQUEST["FromDate"]   : '0000-00-00';
+$ToDate     = isset($_REQUEST["ToDate"])     ? $_REQUEST["ToDate"]     : '0000-00-00';
+$CategoryID = isset($_REQUEST["CategoryID"]) ? intval($_REQUEST["CategoryID"]) : 0;
 
-
-
-if (!empty($_REQUEST["SalerNameID"])) {
-
-    // One Project
-
-
-    $categories = SQL_Select("category");
-
-
+if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
+    $Count = 0;
     $sl = 1;
     $trHtml = "";
 
-    $TotalFlatAmount = 0;
-    $TotalCarParkingCharge = 0;
-    $TotalUtilityCharge = 0;
-    $TotalAdditionalWorkCharge = 0;
-    $TotalOtherCharge = 0;
-
-    $TotalDeductionCharge = 0;
-
-    $TotalRefundWorkCharge=0;
-
-    $TotalNetSalesPriceAmount = 0;
-
-    $GrandTotalActualReceiveAmount = 0;
-    $GrandTotalDueAmount = 0;
-
-    $grandActualDue = 0;
-    $GrandTotalCommission =0;
-    $GrandTotalPaidCommission =0;
-    $GrandTotalDueCommission=0;
-    $grandPDQuantity = 0;
-
-
-    foreach ($categories as $category) {
-        $salesProjctDetails = SQL_Select("sales where SellerID='{$_REQUEST["SalerNameID"]}' and SalesDate BETWEEN '{$FromDate}' and '{$ToDate}' ORDER BY `SalesDate` Asc");
-
-
-        foreach ($salesProjctDetails as $salesProjctDetail) {
-
-            $DeductionCharge=$TotalNetSalesPrice=0;
-
-            $SalesID = $salesProjctDetail["SalesID"];
-
-            $customerName = $salesProjctDetail["CustomerName"];
-            $CustomerID = $salesProjctDetail["CustomerID"];
-
-            $SellerName = $salesProjctDetail["SellerName"];
-            $SalerNameID = $_REQUEST["SalerNameID"];
-
-            $SalesDate = $salesProjctDetail["SalesDate"];
-            $ProjectName = $salesProjctDetail["ProjectName"];
-
-            $ProductName = $salesProjctDetail["ProductName"];
-
-            $grandPDQuantity += $salesProjctDetail["Quantity"];
-
-            $ProductDetailsArray = explode("-", $ProductName);
-
-            $floor = $ProductDetailsArray[0];
-            $type = $ProductDetailsArray[1];
-            $TotalDueCommission = 0;
-
-
-//            $ProductDetails = SQL_Select("products where CategoryID={$category["CategoryID"]} ");
-//
-//
-//            $FlatPrice = $ProductDetails[0]["FlatPrice"];
-//
-//            $TotalFlatAmount += $FlatPrice;
-
-            $ProductDetails = SQL_Select("products where ProductsID={$salesProjctDetail["ProductID"]} ");
-            $FlatPrice = $ProductDetails[0]["FlatPrice"];
-            $TotalFlatAmount += $FlatPrice;
-
-            //$CarParkingCharge = $ProductDetails[0]["CarParkingCharge"];
-
-            //$TotalCarParkingCharge += $CarParkingCharge;
-
-            //$UtilityCharge = $ProductDetails[0]["UtilityCharge"];
-
-            //$TotalUtilityCharge += $UtilityCharge;
-
-            //$AdditionalWorkCharge = $ProductDetails[0]["AdditionalWorkCharge"];
-
-           // $TotalAdditionalWorkCharge += $AdditionalWorkCharge;
-
-            // $OtherCharge = $ProductDetails[0]["OtherCharge"];
-            // $TotalOtherCharge += $OtherCharge;
-
-            //$DeductionCharge = $ProductDetails[0]["DeductionCharge"];
-            $DeductionCharge = $salesProjctDetail["Discount"];
-
-            $TotalDeductionCharge += $DeductionCharge;
-
-            // $RefundAdditionalWorkCharge= $ProductDetails[0]["RefundAdditionalWorkCharge"];
-            // $TotalRefundWorkCharge +=$RefundAdditionalWorkCharge;
-
-            $TotalNetSalesPrice = ($ProductDetails[0]["NetSalesPrice"] * $salesProjctDetail["Quantity"])-$salesProjctDetail["Discount"];
-            $TotalNetSalesPriceAmount += $TotalNetSalesPrice;
-
-
-//        Actual payment
-            $ActualPaymentDetails = SQL_Select("actualsalsepayment where SalesID={$SalesID}");
-            $TotalActualReceiveAmount = 0;
-            foreach ($ActualPaymentDetails as $ActualPaymentDetail) {
-                $TotalActualReceiveAmount += $ActualPaymentDetail["ActualReceiveAmount"];
-            }
-            $GrandTotalActualReceiveAmount += $TotalActualReceiveAmount;
-
-//        Due payment
-
-            $DuePaymentDetails = SQL_Select("schedulepayment where SalesID={$SalesID}");
-
-            $TotalDueAmount = 0;
-            foreach ($DuePaymentDetails as $DuePaymentDetail) {
-                $TotalDueAmount += $DuePaymentDetail["PayAbleAmount"];
-            }
-            $GrandTotalDueAmount += $TotalDueAmount;
-
-
-            $ActualDue = $TotalNetSalesPrice - $TotalActualReceiveAmount;
-
-            $grandActualDue += $ActualDue;
-
-            $percentOfcollection = ($TotalActualReceiveAmount / $TotalNetSalesPrice) * 100;
-
-
-// Fetch Booking Money (Total Payable Amount for "Booking Money")
-            $GetBookingMoney = @mysql_fetch_array(mysql_query("SELECT SUM(PayAbleAmount) as total FROM tblschedulepayment WHERE SalesID={$SalesID} AND Title='Booking Money'"), MYSQL_ASSOC);
-
-// Fetch Rest of Money (Total Payable Amount for non-Booking Money)
-            $GetRestofMoney = @mysql_fetch_array(mysql_query("SELECT SUM(PayAbleAmount) as total FROM tblschedulepayment WHERE SalesID={$SalesID} AND Title != 'Booking Money'"), MYSQL_ASSOC);
-
-// Step 1: Fetch SellerID from tblsales based on SalesID
-            $GetSellerID = @mysql_fetch_array(mysql_query("SELECT SellerID FROM tblsales WHERE SalesID = {$SalesID}"), MYSQL_ASSOC);
-
-// Step 2: Fetch Seller's Commission Percentages
-            if ($GetSellerID) {
-                $SellerID = $GetSellerID['SellerID'];
-
-                // Fetch RestOfCommission for the seller from tblsalername
-                $GetSalerRestofPercent = @mysql_fetch_array(mysql_query("SELECT RestOfCommission FROM tblsalername WHERE SalerNameID = {$SellerID}"), MYSQL_ASSOC);
-                $GetSalerBookingPercent = @mysql_fetch_array(mysql_query("SELECT Commission FROM tblsalername WHERE SalerNameID = {$SellerID}"), MYSQL_ASSOC);
-
-                // Step 3: Calculate Total Commission if Seller and Data are found
-                if ($GetSalerRestofPercent && $GetSalerBookingPercent) {
-                    $BookingCommissionPercent = isset($GetSalerBookingPercent['Commission']) ? $GetSalerBookingPercent['Commission'] : 0; // Default to 0 if null
-                    $RestOfCommissionPercent = isset($GetSalerRestofPercent['RestOfCommission']) ? $GetSalerRestofPercent['RestOfCommission'] : 0; // Default to 0 if null
-
-                    $TotalCommission = 0;
-
-                    // Calculate Commission for Booking Money
-                    //$BookingMoneyTotal = isset($GetBookingMoney["total"]) ? $GetBookingMoney["total"] : 0; // Default to 0 if null
-                    $BookingMoneyTotal = $TotalActualReceiveAmount; // Default to 0 if null
-
-
-
-                    if ($TotalActualReceiveAmount > $GetBookingMoney['total']) {
-                        // Apply 10% commission on the booking money
-                        $TotalCommission += ($GetBookingMoney['total'] * $BookingCommissionPercent) / 100;
-
-                        // Calculate the remaining money after booking money
-                        $RestofMoneyTotal = $TotalActualReceiveAmount - $GetBookingMoney['total'];
-
-                        // Apply 4% commission on the remaining amount
-                        $TotalCommission += ($RestofMoneyTotal * $RestOfCommissionPercent) / 100;
-                    } else {
-                        // If actual amount is less than or equal to booking money, apply 10% commission on the actual amount
-                        $TotalCommission += ($TotalActualReceiveAmount * $BookingCommissionPercent) / 100;
-                    }
-                    $GrandTotalCommission += $TotalCommission;
-                    // Calculate Commission for Rest of Money
-                    //$RestofMoneyTotal = isset($GetRestofMoney["total"]) ? $GetRestofMoney["total"] : 0; // Default to 0 if null
-
-
-
-
-                    // DUE And PAid
-                    // Step 1: Fetch Total Paid Commission from tblsalerpayment
-                    $GetTotalPaidCommission = @mysql_fetch_array(mysql_query("SELECT SUM(Amount) as total FROM tblsalerpayment WHERE SalesID = {$SalesID}"), MYSQL_ASSOC);
-
-                    // Step 2: Calculate Total Due Commission
-                    if ($GetTotalPaidCommission) {
-                        $TotalPaidCommission = isset($GetTotalPaidCommission['total']) ? $GetTotalPaidCommission['total'] : 0; // Default to 0 if null
-
-                        // Step 3: Calculate Total Due Commission
-                        $TotalDueCommission = $TotalCommission - $TotalPaidCommission;
-
-                        // Optional: Output the total commission
-//                         echo "Total Paid Commission: " . $TotalPaidCommission;
-//                         echo "Total Due Commission: " . $TotalDueCommission;
-                    } else {
-                        // Default to 0 if no paid commission data found
-                        $TotalPaidCommission = 0;
-                        $TotalDueCommission = $TotalCommission; // If no paid commission, all is due
-                    }
-                    $GrandTotalPaidCommission += $TotalPaidCommission;
-                    $GrandTotalDueCommission += $TotalDueCommission;
-                    // Output the total commission (optional)
-                    // echo "Total Commission: " . $TotalCommission;
-                } else {
-                    echo "Error: Could not fetch commission percentages for SellerID {$SellerID}.";
-                }
-            } else {
-                echo "Error: SellerID not found for SalesID {$SalesID}.";
-            }
-
-
-
-
-
-
-
-            // salesman commission calculation
-
-
-            $trHtml .= '
-        
-        <tr>
-            <td class="text-center">' . $sl . '</td>
-            <td class="text-left">' . $SalesID . '</td>
-            <td class="text-left">' . $customerName." - $CustomerID" . '</td>
-            <td class="text-left">' . $SellerName." - $SalerNameID" . '</td>
-            <td class="text-left">' . HumanReadAbleDateFormat($SalesDate) . '</td>
-            <td class="text-left">' . $ProjectName . '</td>
-            <td class="text-left">' . $ProductName . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($FlatPrice) . '</td>
-            <td class="text-right">' . $salesProjctDetail["Quantity"] . '</td>
-
-            <td class="text-right">' . BangladeshiCurencyFormat($DeductionCharge) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($TotalNetSalesPrice) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($TotalActualReceiveAmount) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($ActualDue) . '</td>
-            <td class="text-right">' . round($percentOfcollection, 2) . ' %</td>
-
-            <td class="text-right">' . BangladeshiCurencyFormat($TotalCommission) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($TotalPaidCommission) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($TotalDueCommission) . '</td>
-            
-        </tr>
-        
-        
-        ';
-
-            $sl++;
-
-
-        }
-
+    $TotalCrAmount = 0;
+    $TotalDrAmount = 0;
+    $TotalDueAmount = 0;
+    $TotalFlatPrice = 0;
+    $TotalShareQty = 0;
+
+    $ProjectName = "All Categories";
+    if ($CategoryID > 0) {
+        $categoryData = SQL_Select("category", "CategoryID=" . $CategoryID);
+        $ProjectName  = isset($categoryData[0]["Name"]) ? $categoryData[0]["Name"] : "Unknown Category";
     }
 
-} else {
+    $salesCondition = "SalesDate BETWEEN '" . $FromDate . "' AND '" . $ToDate . "'";
+    if ($CategoryID > 0) {
+        $salesCondition .= " AND ProjectID=" . $CategoryID;
+    }
 
-    header("location: index.php?Theme=default&Base=Report&Script=Manage");
+    // sales
+    $SalesList = SQL_Select("sales", $salesCondition . " ORDER BY SalesDate ASC");
+
+    foreach ($SalesList as $Sales) {
+        $SalesID    = $Sales["SalesID"];
+        $ProductID  = $Sales["ProductID"];
+        $CustomerID = $Sales["CustomerID"];
+        $SaleProject = SQL_Select("category", "CategoryID=" . $Sales["ProjectID"], "", true);
+
+        $Discount = isset($Sales["Discount"]) ? $Sales["Discount"] : 0;
+        $ShareQty = isset($Sales["Quantity"]) ? $Sales["Quantity"] : 0;
+
+        // Product
+        $ProductDetails = SQL_Select("products", "ProductsID=" . $ProductID);
+
+        $ProductName  = isset($ProductDetails[0]["FlatType"]) ? $ProductDetails[0]["FlatType"] : "-";
+        $ProductPrice = isset($ProductDetails[0]["NetSalesPrice"]) ? $ProductDetails[0]["NetSalesPrice"] : 0;
+        $SalLer = SQL_Select("SalerName", "SalerNameID=" . $Sales["SellerID"], "", true);
+        $SellerName = isset($SalLer["Name"]) ? $SalLer["Name"] : "-";
+        $SalesDate  = isset($Sales["SalesDate"]) ? $Sales["SalesDate"] : "-";
+        $Division   = isset($Sales["Division"]) ? $Sales["Division"] : "-";
+
+        if($Sales["SellerID"]!=$_REQUEST["SalerNameID"]){
+            continue;
+        }
+        // --- CrV
+        $CrVouchers = SQL_Select(
+            "CrVoucher",
+            "Date BETWEEN '" . $FromDate . "' AND '" . $ToDate . "' 
+             AND CrVoucherIsDisplay=0 
+             AND ProductsID=" . $ProductID . " 
+             AND CustomerID=" . $CustomerID . " 
+             ORDER BY Date ASC"
+        );
+        $CrAmount = 0;
+        $CrVoucherNos = array();
+        $LastCrDate = "";
+        foreach ($CrVouchers as $Cr) {
+            $CrAmount += $Cr["Amount"];
+            $CrVoucherNos[] = $Cr["CrVoucherID"];
+            $LastCrDate = $Cr["Date"];
+        }
+
+        // --- DrT
+        $DrAmount = 0;
+        $DrVoucherNos = array();
+        $DrVouchers = SQL_Select(
+            "Transaction",
+            "Date BETWEEN '" . $FromDate . "' AND '" . $ToDate . "' 
+             AND CustomerID=" . $CustomerID . " 
+             ORDER BY Date ASC"
+        );
+        foreach ($DrVouchers as $Dr) {
+            $DrAmount += $Dr["dr"];
+            $DrVoucherNos[] = $Dr["VoucherNo"];
+        }
+
+        // Sum
+        $DueAmount = $ProductPrice - ($CrAmount - $DrAmount);
+        $PercentCollection = ($ProductPrice > 0) ? (($CrAmount - $DrAmount) / $ProductPrice) * 100 : 0;
+
+        $CustomerName  = GetCustomerName($CustomerID);
+        $CustomerPhone = GetCustomerPhone($CustomerID);
+
+        $trHtml .= "
+        <tr style='text-align:center;'>
+            <td>" . $sl . "<br>SID:" . $SalesID . "</td>
+            <td>" . $SaleProject["Name"] . "</td>
+            <td class='text-left'>" . $CustomerName . " - ID: " . $CustomerID . "<br>" . $CustomerPhone . "</td>
+            <td class='text-left'>" . $SellerName . "</td>
+            <td>" . $SalesDate . "</td>
+            <td>" . $LastCrDate . "</td>
+            <td>" . $Division . "</td>
+            <td>" . $ProductName . "</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
+            <td class='text-right'>" . $ShareQty . "</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($Discount) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($CrAmount) . "/-</td>
+            <td class='text-right'>" . number_format($PercentCollection, 2) . "%</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($DueAmount) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($CrAmount - $DrAmount) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($DrAmount) . "/-</td>
+            <td class='text-right'>" . implode(', ', $CrVoucherNos) . "</td>
+            <td class='text-right'>" . implode(', ', $DrVoucherNos) . "</td>
+        </tr>";
+
+        // Totals
+        $TotalCrAmount += $CrAmount;
+        $TotalDrAmount += $DrAmount;
+        $TotalDueAmount += $DueAmount;
+        $TotalFlatPrice += $ProductPrice;
+        $TotalShareQty += $ShareQty;
+        $sl++;
+        $Count++;
+    }
 }
 
 
@@ -283,7 +139,8 @@ $MainContent .= '
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <title>Customer Party Ledger Summary</title>
+    <title>Customer Party Ledger Summary For ' . $ProjectName . '</title>
+
 
     <style>
         .m-b-30 {
@@ -325,37 +182,43 @@ $MainContent .= '
     </div>
 
     <div class="projectName text-center m-b-30 m-t-30">
-        <h4 style="font-weight: bold">Seller Name Wise Party Ledger</h4>
-        <p class="text-right">From: '.$_REQUEST["FromDate"].' To:  '.$_REQUEST["ToDate"].'</p>
+        <h4 style="font-weight: bold">Customer Party Ledger Summary </h4>
+        <h4 style="font-weight: normal">For</h4>
+                        <h4 style="font-weight: bold">'.$_REQUEST["Division"].' Division</h4>
+
+        <h4 style="font-weight: normal">'.$ProjectName.'</h4>
+        <p class="text-right">From: '.$FromDate.' To:  '.$ToDate.'</p>
     </div>
     
-    
-    <table style="font-size: 16px" class="table table-bordered table-hover table-fixed table-sm">
+    <button class="btn btn-info" onclick="exportToCSV()">Export to CSV</button>
+<button class="btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+    <table style="font-size: 16px" id="myTable" class="mt-4 table table-bordered table-hover table-fixed table-sm">
 
         <thead>
             <tr>
-                <th colspan="17" scope="col" class="text-center"><h6 style="font-weight: bold;">Customer
+                <th colspan="16" scope="col" class="text-center"><h6 style="font-weight: bold;">Customer
                         Information</h6></th>
             </tr>
             <tr style="text-align: center">
                 <td>Serial No.</td>
-                <td>Sales ID</td>
+                <td>Project</td>
                 <td>Customer Name</td>
                 <td>Seller Name</td>
                 <td>Date Of Sales</td>
-                <td>Project Name</td>
-                <td>Share No</td>
+                <td>Pay Date</td>
+                <td>Division</td>
+                <td>Package Name</td>
                 <td>Share Value</td>
                 <td>Share QTY</td>
                 <td>Discount</td>
-                <td>Total</td>
-                <td>Total Collection</td>
+                <td>Sub Total</td>
+                <td>Total Collaction</td>
+                <td>Percent of Collaction</td>
                 <td>Total Due</td>
-                <td>Percent of Collection</td>
-                <td>Total Comm.</td>
-                <td>Paid Comm.</td>
-                <td>Due Comm.</td>
-
+                <td>Balance</td>
+                <td>Total DR</td>
+                <td> CR Voucher No</td>
+                <td> DR Voucher No</td>
             </tr>
 
         </thead>
@@ -365,62 +228,41 @@ $MainContent .= '
             ' . $trHtml . '
             
             <tr style="height: 35px;">
-                <td colspan="17" class="text-left"></td>
+                <td colspan="7" class="text-left"></td>
                 
             </tr>
-            <tr style="font-weight: bold;">
-                <td colspan="7" class="text-right">Total =</td>
                 
-                <td class="text-right">' . BangladeshiCurencyFormat($TotalFlatAmount) . '</td>
-                <td class="text-right">' . $grandPDQuantity . '</td>
-                <td class="text-right">' . BangladeshiCurencyFormat($TotalDeductionCharge) . '</td>
-                <td class="text-right">' . BangladeshiCurencyFormat($TotalNetSalesPriceAmount) . '</td>
-                <td class="text-right">' . BangladeshiCurencyFormat($GrandTotalActualReceiveAmount) . '</td>
-                <td class="text-right">' . BangladeshiCurencyFormat($grandActualDue) . '</td>
-                <td class="text-right">' . BangladeshiCurencyFormat() . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($GrandTotalCommission) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($GrandTotalPaidCommission) . '</td>
-            <td class="text-right">' . BangladeshiCurencyFormat($GrandTotalDueCommission) . '</td>
-                
-                
-            </tr>
+           <tr style="font-weight: bold">
+    <td colspan="8" class="text-right">Total =</td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalFlatPrice).'</td>
+    <td class="text-right">'.$TotalShareQty.'</td>
+    <td></td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalFlatPrice).'</</td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalCrAmount).'</td>
+    <td></td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalDueAmount).'</td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalCrAmount - $TotalDrAmount).'</td>
+    <td class="text-right">'.BangladeshiCurencyFormat($TotalDrAmount).'</td>
+    <td colspan="2"></td>
+</tr>
              
             
         </tbody>
 
     </table>
+                    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+function exportToCSV() {
+  let table = document.getElementById("myTable");
+  let wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+  XLSX.writeFile(wb, "table_data.csv", { bookType: "csv" });
+}
+
+function exportToExcel() {
+  let table = document.getElementById("myTable");
+  let wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+  XLSX.writeFile(wb, "table_data.xlsx");
+}
+</script>
 
 </div>';
-
-
-
-
-
-
-//Draft
-
-//$GetBookingMoney = @mysql_fetch_array(mysql_query("SELECT SUM(PayAbleAmount) as total FROM tblschedulepayment WHERE SalesID=115 AND Title='Booking Money'"), MYSQL_ASSOC);
-//$GetRestofMoney = @mysql_fetch_array(mysql_query("SELECT SUM(PayAbleAmount) as total FROM tblschedulepayment WHERE SalesID=115 AND Title != 'Booking Money'"), MYSQL_ASSOC);
-//
-//$ActualPaymentDetails = @mysql_fetch_array(mysql_query("SELECT SUM(ActualReceiveAmount) as total FROM tblactualsalsepayment WHERE SalesID=115"), MYSQL_ASSOC);
-//
-//$bookingAmount = $GetBookingMoney['total'];
-//$actualAmount = $ActualPaymentDetails['total'];
-//
-//$commission = 0;
-//
-//// Commission calculation logic
-//if ($actualAmount <= $bookingAmount) {
-//    // If the actual amount is less than or equal to booking money, apply 10% commission
-//    $commission = $actualAmount * 0.10;
-//} else {
-//    // If the actual amount is greater than the booking money
-//    // Apply 10% commission on booking amount
-//    $commission = $bookingAmount * 0.10;
-//
-//    // Apply 4% commission on the remaining amount (ActualAmount - BookingAmount)
-//    $commission += ($actualAmount - $bookingAmount) * 0.04;
-//}
-//
-//echo "Commission: " . $commission;
-
