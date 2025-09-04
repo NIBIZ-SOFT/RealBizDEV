@@ -1,7 +1,7 @@
 <?php
 
 // For Showing Database
-$opt = SQL_Select("CrVoucher");
+$opt = SQL_Select("actualsalsepayment");
 if (!empty($opt)) {
     echo "<table border='1' cellpadding='6' cellspacing='0'>";
 

@@ -33,29 +33,29 @@ $allActualPaymentDetails = SQL_Select("Actualsalsepayment where SalesID={$_GET["
 // $allScheduleDetails 
 
 $todaysDate = date("Y-m-d");
-$todaysDateNumber=strtotime($todaysDate);
-$totalDateSchedulAmount=0;
+$todaysDateNumber = strtotime($todaysDate);
+$totalDateSchedulAmount = 0;
 
 foreach ($allScheduleDetails as $allScheduleDateDetail) {
-	if (  strtotime($allScheduleDateDetail["Date"]) <= $todaysDateNumber ) {
-		$totalDateSchedulAmount += $allScheduleDateDetail["PayAbleAmount"];
-	}
+    if (strtotime($allScheduleDateDetail["Date"]) <= $todaysDateNumber) {
+        $totalDateSchedulAmount += $allScheduleDateDetail["PayAbleAmount"];
+    }
 }
 
 
 foreach ($allActualPaymentDetails as $allActualPaymentDateDetail) {
-	if (  strtotime($allActualPaymentDateDetail["DateOfCollection"]) <= $todaysDateNumber ) {
-		$totalDateActualAmount += $allActualPaymentDateDetail["ActualReceiveAmount"];
-	}
+    if (strtotime($allActualPaymentDateDetail["DateOfCollection"]) <= $todaysDateNumber) {
+        $totalDateActualAmount += $allActualPaymentDateDetail["ActualReceiveAmount"];
+    }
 }
-$tillDueAmount=$totalDateActualAmount-$totalDateSchedulAmount;
+$tillDueAmount = $totalDateActualAmount - $totalDateSchedulAmount;
 
 if ($tillDueAmount == 0) {
-	$dueText = '<h5 class="text-center text-success">Till Due Amount: '.$tillDueAmount.'</h5>';
-}else if ( $tillDueAmount > 0) {
-		$dueText = '<h5 class="text-center text-success">Till Due Amount: '.$tillDueAmount.'</h5>';
-}else{
-	$dueText = '<h2 style="color:red" class="text-center">Till Due Amount: '.$tillDueAmount.'</h5>';
+    $dueText = '<h5 class="text-center text-success">Till Due Amount: ' . $tillDueAmount . '</h5>';
+} else if ($tillDueAmount > 0) {
+    $dueText = '<h5 class="text-center text-success">Till Due Amount: ' . $tillDueAmount . '</h5>';
+} else {
+    $dueText = '<h2 style="color:red" class="text-center">Till Due Amount: ' . $tillDueAmount . '</h5>';
 }
 // Till Due Amount End
 
@@ -75,8 +75,8 @@ if (!empty($allScheduleDetails)) {
 
     $totalDueamountValue = 0;
 
-    $ActualReceiveAmount=0;
-    $TotalReceiveAmount=0;
+    $ActualReceiveAmount = 0;
+    $TotalReceiveAmount = 0;
 
     foreach ($allScheduleDetails as $allScheduleDetail) {
 
@@ -106,9 +106,8 @@ if (!empty($allScheduleDetails)) {
                 $tatalDueAmount[$i] = $allScheduleDetail["PayAbleAmount"];
                 $displayStatusForEdit = "";
             }
-
         } else {
-            $AcutalPamentDetails = SQL_Select("Actualsalsepayment where DateOfCollection > '{$schedleDate[$i-1]}' AND  DateOfCollection <='{$schedleDate[$i]}'   AND SalesID={$_GET["SalesID"]} ");
+            $AcutalPamentDetails = SQL_Select("Actualsalsepayment where DateOfCollection > '{$schedleDate[$i - 1]}' AND  DateOfCollection <='{$schedleDate[$i]}'   AND SalesID={$_GET["SalesID"]} ");
 
 
             // finding this date or bigger date then edit lock
@@ -149,7 +148,6 @@ if (!empty($allScheduleDetails)) {
     }
 
     $totalSchedulePament = $ScudeleCumulativePayment[count($allScheduleDetails)];
-
 } else {
 
     $ScheduleItems .= '
@@ -190,39 +188,37 @@ if (!empty($allActualPaymentDetails)) {
         }
 
         $ActualReceiveAmount += $allScheduleDetail["ActualReceiveAmount"];
-        $TotalReceiveAmount +=$allScheduleDetail["ReceiveAmount"];
+        $TotalReceiveAmount += $allScheduleDetail["ReceiveAmount"];
 
-        $TotalAdjustment +=$allScheduleDetail["Adjustment"];
+        $TotalAdjustment += $allScheduleDetail["Adjustment"];
 
 
         $ActualleItems .= '
 
 			<tr>
 			  <td>' . $i . '</th>
-			  <td>'.$allScheduleDetail["Term"].'</td>
+			  <td>' . $allScheduleDetail["Term"] . '</td>
 			  <td style="text-align:center">' . taka_format($allScheduleDetail["ReceiveAmount"]) . '</td>
 			  <td style="text-align:center">' . taka_format($allScheduleDetail["Adjustment"]) . '</td>
 			  <td style="text-align:center">' . taka_format($allScheduleDetail["ActualReceiveAmount"]) . '</td>
 			  <td style="text-align:center">' . HumanReadAbleDateFormat($allScheduleDetail["DateOfCollection"]) . '</td>
-			  <td style="text-align:center">'.$allScheduleDetail["MRRNO"].'</td>
-			  <td style="text-align:center">'.$allScheduleDetail["ModeOfPayment"].'</td>
-			  <td style="text-align:center">'.$allScheduleDetail["ChequeNo"].'</td>
-			  <td style="text-align:center">'.$allScheduleDetail["BankName"].'</td>
-			  <td style="text-align:center">'.$allScheduleDetail["Remark"].'</td>	  
+			  <td style="text-align:center">' . $allScheduleDetail["MRRNO"] . '</td>
+			  <td style="text-align:center">' . $allScheduleDetail["ModeOfPayment"] . '</td>
+			  <td style="text-align:center">' . $allScheduleDetail["ChequeNo"] . '</td>
+			  <td style="text-align:center">' . $allScheduleDetail["BankName"] . '</td>
+			  <td style="text-align:center">' . $allScheduleDetail["Remark"] . '</td>	  
+			  <td style="text-align:center"><a href="' . ApplicationURL("SchedulePayment", "MoneyReceipt&NoHeader&NoFooter&ID={$allScheduleDetail["MRRNO"]}") . '" class="btn btn-success" >Print</a></td>	  
 			</tr>
 
 		';
 
         $i++;
-
     }
 
     $totalActualPament = $ActualCumulativePayment[count($allActualPaymentDetails)];
-
-
 }
 
-$DueAmount=$totalSchedulePament-$ActualReceiveAmount;
+$DueAmount = $totalSchedulePament - $ActualReceiveAmount;
 
 
 
@@ -233,9 +229,9 @@ if (!empty($allActualPaymentDetails)) {
 		<tr>
 			<td style="text-align: right" colspan="2">Total =</td>
             
-            <td style="text-align: center">'.taka_format($TotalReceiveAmount).'</td>
-            <td style="text-align: center">'.taka_format($TotalAdjustment).'</td>
-            <td  style="text-align: center">'.taka_format($ActualReceiveAmount).'</td>
+            <td style="text-align: center">' . taka_format($TotalReceiveAmount) . '</td>
+            <td style="text-align: center">' . taka_format($TotalAdjustment) . '</td>
+            <td  style="text-align: center">' . taka_format($ActualReceiveAmount) . '</td>
             <td colspan="7"></td>
 		<tr>
     
@@ -246,10 +242,9 @@ if (!empty($allActualPaymentDetails)) {
             
             <td colspan="5" style="text-align: right;" colspan="2">Total Receivable  Amount =</td>
             
-            <td colspan="2" style="text-align: center"> '.taka_format($DueAmount).' </td>
+            <td colspan="2" style="text-align: center"> ' . taka_format($DueAmount) . ' </td>
             
 		<tr>';
-
 } else {
 
     $emptyTable = '
@@ -273,7 +268,7 @@ $MainContent .= '
 
 
 
-'.$dueText.'
+' . $dueText . '
 
 <table  class="table table-bordered">
 	<tr>
@@ -303,7 +298,6 @@ $MainContent .= '
 
 
 if (empty($allScheduleDetails)) {
-
 } else {
 
     $MainContent .= '
@@ -329,6 +323,7 @@ if (empty($allScheduleDetails)) {
 	  <th style=" font-size:14px; ">Chq No</th>
 	  <th style=" font-size:14px; ">Bank Name</th>
 	  <th style=" font-size:14px; ">Remarks</th>
+	  <th style=" font-size:14px; ">Action</th>
 	</tr>
 
 	' . $ActualleItems . '
@@ -339,8 +334,6 @@ if (empty($allScheduleDetails)) {
 
 
 ';
-
-
 }
 
 
@@ -364,6 +357,3 @@ $MainContent .= '
 
 
 </script>';
-
-
-?>
