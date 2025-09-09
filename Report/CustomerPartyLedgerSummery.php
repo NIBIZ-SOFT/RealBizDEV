@@ -44,6 +44,7 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
 
         $ProductName  = isset($ProductDetails[0]["FlatType"]) ? $ProductDetails[0]["FlatType"] : "-";
         $ProductPrice = isset($ProductDetails[0]["NetSalesPrice"]) ? $ProductDetails[0]["NetSalesPrice"] : 0;
+        $subTotal = ($ProductPrice * $ShareQty) - $Discount;
         $SalLer = SQL_Select("SalerName", "SalerNameID=" . $Sales["SellerID"], "", true);
         $SellerName = isset($SalLer["Name"]) ? $SalLer["Name"] : "-";
         $SalesDate  = isset($Sales["SalesDate"]) ? $Sales["SalesDate"] : "-";
@@ -82,8 +83,8 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
         }
 
         // Sum
-        $DueAmount = $ProductPrice - ($CrAmount - $DrAmount);
-        $PercentCollection = ($ProductPrice > 0) ? (($CrAmount - $DrAmount) / $ProductPrice) * 100 : 0;
+        $DueAmount = $subTotal - ($CrAmount - $DrAmount);
+        $PercentCollection = ($subTotal > 0) ? (($CrAmount - $DrAmount) / $subTotal) * 100 : 0;
 
         $CustomerName  = GetCustomerName($CustomerID);
         $CustomerPhone = GetCustomerPhone($CustomerID);
@@ -101,7 +102,7 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
             <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
             <td class='text-right'>" . $ShareQty . "</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($Discount) . "/-</td>
-            <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($subTotal) . "/-</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($CrAmount) . "/-</td>
             <td class='text-right'>" . number_format($PercentCollection, 2) . "%</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($DueAmount) . "/-</td>
@@ -115,7 +116,7 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
         $TotalCrAmount += $CrAmount;
         $TotalDrAmount += $DrAmount;
         $TotalDueAmount += $DueAmount;
-        $TotalFlatPrice += $ProductPrice;
+        $TotalFlatPrice += $subTotal;
         $TotalShareQty += $ShareQty;
         $sl++;
         $Count++;

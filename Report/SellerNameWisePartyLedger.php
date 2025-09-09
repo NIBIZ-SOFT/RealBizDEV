@@ -44,12 +44,13 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
 
         $ProductName  = isset($ProductDetails[0]["FlatType"]) ? $ProductDetails[0]["FlatType"] : "-";
         $ProductPrice = isset($ProductDetails[0]["NetSalesPrice"]) ? $ProductDetails[0]["NetSalesPrice"] : 0;
+        $subTotal = ($ProductPrice * $ShareQty) - $Discount;
         $SalLer = SQL_Select("SalerName", "SalerNameID=" . $Sales["SellerID"], "", true);
         $SellerName = isset($SalLer["Name"]) ? $SalLer["Name"] : "-";
         $SalesDate  = isset($Sales["SalesDate"]) ? $Sales["SalesDate"] : "-";
         $Division   = isset($Sales["Division"]) ? $Sales["Division"] : "-";
 
-        if($Sales["SellerID"]!=$_REQUEST["SalerNameID"]){
+        if ($Sales["SellerID"] != $_REQUEST["SalerNameID"]) {
             continue;
         }
         // --- CrV
@@ -85,8 +86,8 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
         }
 
         // Sum
-        $DueAmount = $ProductPrice - ($CrAmount - $DrAmount);
-        $PercentCollection = ($ProductPrice > 0) ? (($CrAmount - $DrAmount) / $ProductPrice) * 100 : 0;
+        $DueAmount = $subTotal - ($CrAmount - $DrAmount);
+        $PercentCollection = ($subTotal > 0) ? (($CrAmount - $DrAmount) / $subTotal) * 100 : 0;
 
         $CustomerName  = GetCustomerName($CustomerID);
         $CustomerPhone = GetCustomerPhone($CustomerID);
@@ -104,7 +105,7 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
             <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
             <td class='text-right'>" . $ShareQty . "</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($Discount) . "/-</td>
-            <td class='text-right'>" . BangladeshiCurencyFormat($ProductPrice) . "/-</td>
+            <td class='text-right'>" . BangladeshiCurencyFormat($subTotal) . "/-</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($CrAmount) . "/-</td>
             <td class='text-right'>" . number_format($PercentCollection, 2) . "%</td>
             <td class='text-right'>" . BangladeshiCurencyFormat($DueAmount) . "/-</td>
@@ -118,7 +119,7 @@ if ($FromDate != '0000-00-00' && $ToDate != '0000-00-00') {
         $TotalCrAmount += $CrAmount;
         $TotalDrAmount += $DrAmount;
         $TotalDueAmount += $DueAmount;
-        $TotalFlatPrice += $ProductPrice;
+        $TotalFlatPrice += $subTotal;
         $TotalShareQty += $ShareQty;
         $sl++;
         $Count++;
@@ -139,7 +140,7 @@ $MainContent .= '
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <title>Customer Party Ledger Summary For ' . $ProjectName . '</title>
+    <title>Seller Party Ledger Summary For ' . $ProjectName . '</title>
 
 
     <style>
@@ -182,12 +183,12 @@ $MainContent .= '
     </div>
 
     <div class="projectName text-center m-b-30 m-t-30">
-        <h4 style="font-weight: bold">Customer Party Ledger Summary </h4>
+        <h4 style="font-weight: bold">Seller Party Ledger Summary </h4>
         <h4 style="font-weight: normal">For</h4>
-                        <h4 style="font-weight: bold">'.$_REQUEST["Division"].' Division</h4>
+                        <h4 style="font-weight: bold">' . $_REQUEST["Division"] . ' Division</h4>
 
-        <h4 style="font-weight: normal">'.$ProjectName.'</h4>
-        <p class="text-right">From: '.$FromDate.' To:  '.$ToDate.'</p>
+        <h4 style="font-weight: normal">' . $ProjectName . '</h4>
+        <p class="text-right">From: ' . $FromDate . ' To:  ' . $ToDate . '</p>
     </div>
     
     <button class="btn btn-info" onclick="exportToCSV()">Export to CSV</button>
@@ -234,15 +235,15 @@ $MainContent .= '
                 
            <tr style="font-weight: bold">
     <td colspan="8" class="text-right">Total =</td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalFlatPrice).'</td>
-    <td class="text-right">'.$TotalShareQty.'</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalFlatPrice) . '</td>
+    <td class="text-right">' . $TotalShareQty . '</td>
     <td></td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalFlatPrice).'</</td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalCrAmount).'</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalFlatPrice) . '</</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalCrAmount) . '</td>
     <td></td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalDueAmount).'</td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalCrAmount - $TotalDrAmount).'</td>
-    <td class="text-right">'.BangladeshiCurencyFormat($TotalDrAmount).'</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalDueAmount) . '</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalCrAmount - $TotalDrAmount) . '</td>
+    <td class="text-right">' . BangladeshiCurencyFormat($TotalDrAmount) . '</td>
     <td colspan="2"></td>
 </tr>
              
