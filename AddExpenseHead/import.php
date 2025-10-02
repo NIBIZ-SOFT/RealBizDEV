@@ -1,7 +1,5 @@
 <?php
 
-
-
 // Set upload directory
 $uploadDir =  "./upload/";
 $filename = $_FILES['importFile']['name'];
