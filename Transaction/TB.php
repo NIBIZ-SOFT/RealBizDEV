@@ -23,9 +23,10 @@ if (!empty($FromDate) && !empty($ToDate)) {
     $totalDrAmount = 0;
     $totalCrAmount = 0;
 
+   
     foreach ($Projects as $Project) {
         // Get all transactions for the current project
-        $transactions = SQL_Select("transaction","voucherType != 'JV' and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+        $transactions = SQL_Select("transaction"," ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
         //$transactions = SQL_Select("transaction WHERE ProjectID = {$Project["CategoryID"]} ");
 
         $subDrTotal = 0;
@@ -45,7 +46,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 if (empty($uniqueHeadOfAccountId)) continue;
 
                 // Get transactions for each unique HeadOfAccount
-                $UniqueTransactionHeadOfAccaunts = SQL_Select("transaction WHERE voucherType != 'JV' and HeadOfAccountID = {$uniqueHeadOfAccountId} AND ProjectID = {$Project["CategoryID"]}  and Date BETWEEN '{$FromDate}' AND '{$ToDate}'" );
+                $UniqueTransactionHeadOfAccaunts = SQL_Select("transaction WHERE HeadOfAccountID = {$uniqueHeadOfAccountId} AND ProjectID = {$Project["CategoryID"]}  and Date BETWEEN '{$FromDate}' AND '{$ToDate}'" );
 
                 // Get HeadOfType and HeadOfAccount details
                 $HeadOfAccountID = $UniqueTransactionHeadOfAccaunts[0]["HeadOfAccountID"];
@@ -103,7 +104,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
 
             foreach ($BankCashes as $BankCash){
 
-                $TransactionInfos=SQL_Select("transaction WHERE voucherType != 'JV' and BankCashID = {$BankCash["BankCashID"]}  and ProjectID = {$Project["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+                $TransactionInfos=SQL_Select("transaction WHERE ProjectID = {$Project["CategoryID"]} And BankCashID = {$BankCash["BankCashID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
                 $drAmount=0;
                 $crAmount=0;
@@ -122,7 +123,7 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 }
 
 //                if ($crAmount > $drAmount) {
-                $balance = $crAmount - $drAmount;
+                    $balance = $crAmount - $drAmount;
 //                } elseif ($drAmount > $crAmount) {
 //                    $balance = $drAmount - $crAmount;
 //                } else {
@@ -190,20 +191,20 @@ if (!empty($FromDate) && !empty($ToDate)) {
                 $HeadOfTypeGlCode = SQL_Select("incomeexpensetype", "GLCode = '{$HeadOfTypeName}'", "", true);
                 $HeadOfTypeNameValue = isset($HeadOfTypeGlCode["Name"]) ? $HeadOfTypeGlCode["Name"] : '';
 
-                // if ($data['drTotal'] > 0 && $data['crTotal'] > 0) {
-                //     $diff = $data['crTotal'] - $data['drTotal'];
+                if ($data['drTotal'] > 0 && $data['crTotal'] > 0) {
+                    $diff = $data['crTotal'] - $data['drTotal'];
 
-                //     if ($diff > 0) {
-                //         $data['crTotal'] = $diff;
-                //         $data['drTotal'] = 0;
-                //     } elseif ($diff < 0) {
-                //         $data['drTotal'] = abs($diff);
-                //         $data['crTotal'] = 0;
-                //     } else {
-                //         $data['drTotal'] = 0;
-                //         $data['crTotal'] = 0;
-                //     }
-                // }
+                    if ($diff > 0) {
+                        $data['crTotal'] = $diff;
+                        $data['drTotal'] = 0;
+                    } elseif ($diff < 0) {
+                        $data['drTotal'] = abs($diff);
+                        $data['crTotal'] = 0;
+                    } else {
+                        $data['drTotal'] = 0;
+                        $data['crTotal'] = 0;
+                    }
+                }
 
 
                 // Sort the children array by GLCode in ascending order.

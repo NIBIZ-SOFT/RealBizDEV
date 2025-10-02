@@ -202,7 +202,7 @@ if (!empty($_POST["CategoryID"]) && !empty($FromDate) && !empty($ToDate)) {
 
         $secondbalance = 0;
 
-        if ($seconduniqueHeadOfAccountId == 2450) continue;
+        if ($seconduniqueHeadOfAccountId == -2450) continue;
 
         if ($HeadType == 1) {
             foreach ($secondUniqueTransactionHeadOfAccounts as $row) {
@@ -248,8 +248,8 @@ if (!empty($_POST["CategoryID"]) && !empty($FromDate) && !empty($ToDate)) {
         // Even if this is empty, still allow second date's value to show
         $HeadOfAccountID = $uniqueHeadOfAccountId;
 
-        // Skip ID 2450
-        if ($HeadOfAccountID == 2450) continue;
+        // Skip ID -2450
+        if ($HeadOfAccountID == -2450) continue;
 
         // Still try to get expense head data
         $HeadTypeData = SQL_Select("expensehead", "ExpenseHeadID='{$HeadOfAccountID}'");
@@ -311,10 +311,10 @@ if (!empty($_POST["CategoryID"]) && !empty($FromDate) && !empty($ToDate)) {
 
 
 
-    $serviceHead = SQL_Select("transaction WHERE HeadOfAccountID = 2450 AND ProjectID = {$_POST["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
+    $serviceHead = SQL_Select("transaction WHERE HeadOfAccountID = -2450 AND ProjectID = {$_POST["CategoryID"]} and Date BETWEEN '{$FromDate}' AND '{$ToDate}'");
 
 // Second date range (assume posted as SecondFromDate and SecondToDate)
-    $secondserviceHead = SQL_Select("transaction WHERE HeadOfAccountID = 2450 AND ProjectID = {$_POST["CategoryID"]} and Date BETWEEN '{$secondFromDate}' AND '{$secondToDate}'");
+    $secondserviceHead = SQL_Select("transaction WHERE HeadOfAccountID = -2450 AND ProjectID = {$_POST["CategoryID"]} and Date BETWEEN '{$secondFromDate}' AND '{$secondToDate}'");
 
 // Group second data by HeadOfAccountName for quick access
     $secondDataMap = array();

@@ -8,55 +8,240 @@ $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
 $FromDate = $_POST['FromDate'];
 $ToDate   = $_POST['ToDate'];
 
+$CategoryID = $_POST["CategoryID"];
+$PostBankCashID = $_POST["BankCashID"];
+
+
 // ---------------- Opening Balance ----------------
 $prevDate = date('Y-m-d', strtotime($FromDate . ' -1 day'));
-$sqlOpening = "
-    SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS OpeningBalance
-    FROM tbltransaction
-    WHERE Date <= '{$prevDate}'
-";
-$resOpening = mysql_query($sqlOpening) or die(mysql_error());
-$rowOpening = mysql_fetch_assoc($resOpening);
-$openingBalance = floatval($rowOpening['OpeningBalance']);
+if(!empty($CategoryID)){
+    if(!empty($PostBankCashID)){
+        
+        $sqlOpening = "
+            SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS OpeningBalance
+            FROM tbltransaction
+            WHERE Date <= '{$prevDate}' AND ProjectID = '{$CategoryID}' AND BankCashID = '{$PostBankCashID}'
+        ";
+        $resOpening = mysql_query($sqlOpening) or die(mysql_error());
+        $rowOpening = mysql_fetch_assoc($resOpening);
+        $openingBalance = floatval($rowOpening['OpeningBalance']);
 
-// ---------------- Period Totals ----------------
-$sqlPeriod = "
-    SELECT IFNULL(SUM(dr), 0) AS TotalDr,
-           IFNULL(SUM(cr), 0) AS TotalCr
-    FROM tbltransaction
-    WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}'
-";
-$resPeriod = mysql_query($sqlPeriod) or die(mysql_error());
-$rowPeriod = mysql_fetch_assoc($resPeriod);
-$totalDr = floatval($rowPeriod['TotalDr']);
-$totalCr = floatval($rowPeriod['TotalCr']);
+        // ---------------- Period Totals ----------------
+        $sqlPeriod = "
+            SELECT IFNULL(SUM(dr), 0) AS TotalDr,
+                IFNULL(SUM(cr), 0) AS TotalCr
+            FROM tbltransaction
+            WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND ProjectID = '{$CategoryID}' AND BankCashID = '{$PostBankCashID}'
+        ";
+        
+        $resPeriod = mysql_query($sqlPeriod) or die(mysql_error());
+        $rowPeriod = mysql_fetch_assoc($resPeriod);
+        $totalDr = floatval($rowPeriod['TotalDr']);
+        $totalCr = floatval($rowPeriod['TotalCr']);
 
-$balance = $totalCr - $totalDr;
-$closingBalance = $openingBalance + $balance;
+        $balance = $totalCr - $totalDr;
+        $closingBalance = $openingBalance + $balance;
 
-// ---------------- Fetch Transactions ----------------
-$sqlTrans = "
-    SELECT *
-    FROM tbltransaction
-    WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}'
-    ORDER BY Date ASC, TransactionID ASC
-";
-$resTrans = mysql_query($sqlTrans) or die(mysql_error());
+        // ---------------- Fetch Transactions ----------------
+        $sqlTrans = "
+            SELECT *
+            FROM tbltransaction
+            WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND ProjectID = '{$CategoryID}' AND BankCashID = '{$PostBankCashID}'
+            ORDER BY Date ASC, TransactionID ASC
+        ";
+        $resTrans = mysql_query($sqlTrans) or die(mysql_error());
+        // ---------------- Fetch Bank/Cash Accounts ----------------
+        $AllBankCashes = SQL_Select("BankCash", "BankCashID='{$PostBankCashID}'"); // Returns an array of bank/cash accounts
+        
+        // Function to get account balance till a date
+        if(empty($AllBankCashes)){
+            $AllBankCashes = SQL_Select("BankCash"); // If no specific bank/cash is selected, fetch all
+        }
+        function getAccountBalanceTill($bankCashID, $tillDate, $CategoryID = null) {
+            $sql = "
+                SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
+                FROM tbltransaction
+                WHERE BankCashID = '{$bankCashID}' AND Date <= '{$tillDate}'" . 
+                ($CategoryID ? " AND ProjectID = '{$CategoryID}'" : "") . "
+            ";
+            $res = mysql_query($sql) or die(mysql_error());
+            $row = mysql_fetch_assoc($res);
+            return floatval($row['Balance']);
+        }
+        
+        // ---------------- Fetch Categories ----------------
+        $AllCategories = SQL_Select("category");
+        // Function to get category name by ID
+        function getCategoryNameByID($categoryID) {
+            $category = SQL_Select("category", "CategoryID='{$categoryID}'", "", true);
+            return $category ? $category['Name'] : 'Unknown Category';
+        }
 
-// ---------------- Fetch Bank/Cash Accounts ----------------
-$AllBankCashes = SQL_Select("BankCash"); // Returns an array of bank/cash accounts
+        // Function to get category balance till a date
+        // function getCategoryBalanceTill($categoryID, $tillDate) {
+        //     $sql = "
+        //         SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
+        //         FROM tbltransaction
+        //         WHERE ProjectID = '{$categoryID}' AND Date <= '{$tillDate}'
+        //     ";
+        //     $res = mysql_query($sql) or die(mysql_error());
+        //     $row = mysql_fetch_assoc($res);
+        //     return floatval($row['Balance']);
+        // }
 
-// Function to get account balance till a date
-function getAccountBalanceTill($bankCashID, $tillDate) {
-    $sql = "
-        SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
-        FROM tbltransaction
-        WHERE BankCashID = '{$bankCashID}' AND Date <= '{$tillDate}'
-    ";
-    $res = mysql_query($sql) or die(mysql_error());
-    $row = mysql_fetch_assoc($res);
-    return floatval($row['Balance']);
+
+    }else{
+            $CategoryData = SQL_Select("category", "CategoryID='{$CategoryID}'", "", true);
+            $sqlOpening = "
+                SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS OpeningBalance
+                FROM tbltransaction
+                WHERE Date <= '{$prevDate}' AND ProjectID = '{$CategoryID}'
+            ";
+            $resOpening = mysql_query($sqlOpening) or die(mysql_error());
+            $rowOpening = mysql_fetch_assoc($resOpening);
+            $openingBalance = floatval($rowOpening['OpeningBalance']);
+
+            // ---------------- Period Totals ----------------
+            $sqlPeriod = "
+                SELECT IFNULL(SUM(dr), 0) AS TotalDr,
+                    IFNULL(SUM(cr), 0) AS TotalCr
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND ProjectID = '{$CategoryID}'
+            ";
+            
+            $resPeriod = mysql_query($sqlPeriod) or die(mysql_error());
+            $rowPeriod = mysql_fetch_assoc($resPeriod);
+            $totalDr = floatval($rowPeriod['TotalDr']);
+            $totalCr = floatval($rowPeriod['TotalCr']);
+
+            $balance = $totalCr - $totalDr;
+            $closingBalance = $openingBalance + $balance;
+
+            // ---------------- Fetch Transactions ----------------
+            $sqlTrans = "
+                SELECT *
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND ProjectID = '{$CategoryID}'
+                ORDER BY Date ASC, TransactionID ASC
+            ";
+            $resTrans = mysql_query($sqlTrans) or die(mysql_error());
+
+            // ---------------- Fetch Bank/Cash Accounts ----------------
+            $AllBankCashes = SQL_Select("BankCash"); // Returns an array of bank/cash accounts
+
+            // Function to get account balance till a date
+            function getAccountBalanceTill($bankCashID, $tillDate, $CategoryID) {
+                $sql = "
+                    SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
+                    FROM tbltransaction
+                    WHERE BankCashID = '{$bankCashID}' AND Date <= '{$tillDate}' AND ProjectID = '{$CategoryID}'
+                ";
+                $res = mysql_query($sql) or die(mysql_error());
+                $row = mysql_fetch_assoc($res);
+                return floatval($row['Balance']);
+            }
+    }  
+}else{
+
+    if(empty($PostBankCashID)){
+        $sqlOpening = "
+                SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS OpeningBalance
+                FROM tbltransaction
+                WHERE Date <= '{$prevDate}'
+            ";
+            $resOpening = mysql_query($sqlOpening) or die(mysql_error());
+            $rowOpening = mysql_fetch_assoc($resOpening);
+            $openingBalance = floatval($rowOpening['OpeningBalance']);
+
+            // ---------------- Period Totals ----------------
+            $sqlPeriod = "
+                SELECT IFNULL(SUM(dr), 0) AS TotalDr,
+                    IFNULL(SUM(cr), 0) AS TotalCr
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}'
+            ";
+            $resPeriod = mysql_query($sqlPeriod) or die(mysql_error());
+            $rowPeriod = mysql_fetch_assoc($resPeriod);
+            $totalDr = floatval($rowPeriod['TotalDr']);
+            $totalCr = floatval($rowPeriod['TotalCr']);
+
+            $balance = $totalCr - $totalDr;
+            $closingBalance = $openingBalance + $balance;
+
+            // ---------------- Fetch Transactions ----------------
+            $sqlTrans = "
+                SELECT *
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}'
+                ORDER BY Date ASC, TransactionID ASC
+            ";
+            $resTrans = mysql_query($sqlTrans) or die(mysql_error());
+
+            // ---------------- Fetch Bank/Cash Accounts ----------------
+            $AllBankCashes = SQL_Select("BankCash"); // Returns an array of bank/cash accounts
+
+            // Function to get account balance till a date
+            function getAccountBalanceTill($bankCashID, $tillDate) {
+                $sql = "
+                    SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
+                    FROM tbltransaction
+                    WHERE BankCashID = '{$bankCashID}' AND Date <= '{$tillDate}'
+                ";
+                $res = mysql_query($sql) or die(mysql_error());
+                $row = mysql_fetch_assoc($res);
+                return floatval($row['Balance']);
+            }
+    }
+    else{
+        $sqlOpening = "
+                SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS OpeningBalance
+                FROM tbltransaction
+                WHERE Date <= '{$prevDate}' AND BankCashID = '{$PostBankCashID}'
+            ";
+            $resOpening = mysql_query($sqlOpening) or die(mysql_error());
+            $rowOpening = mysql_fetch_assoc($resOpening);
+            $openingBalance = floatval($rowOpening['OpeningBalance']);
+
+            // ---------------- Period Totals ----------------
+            $sqlPeriod = "
+                SELECT IFNULL(SUM(dr), 0) AS TotalDr,
+                    IFNULL(SUM(cr), 0) AS TotalCr
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND BankCashID = '{$PostBankCashID}'
+            ";
+            $resPeriod = mysql_query($sqlPeriod) or die(mysql_error());
+            $rowPeriod = mysql_fetch_assoc($resPeriod);
+            $totalDr = floatval($rowPeriod['TotalDr']);
+            $totalCr = floatval($rowPeriod['TotalCr']);
+
+            $balance = $totalCr - $totalDr;
+            $closingBalance = $openingBalance + $balance;
+            // ---------------- Fetch Transactions ----------------
+            $sqlTrans = "
+                SELECT *
+                FROM tbltransaction
+                WHERE Date BETWEEN '{$FromDate}' AND '{$ToDate}' AND BankCashID = '{$PostBankCashID}'
+                ORDER BY Date ASC, TransactionID ASC
+            ";
+            $resTrans = mysql_query($sqlTrans) or die(mysql_error());
+            // ---------------- Fetch Bank/Cash Accounts ----------------
+            $AllBankCashes = SQL_Select("BankCash", "BankCashID='{$PostBankCashID}'"); // Returns an array of bank/cash accounts
+            // Function to get account balance till a date
+            function getAccountBalanceTill($bankCashID, $tillDate) {
+                $sql = "
+                    SELECT IFNULL(SUM(cr), 0) - IFNULL(SUM(dr), 0) AS Balance
+                    FROM tbltransaction
+                    WHERE BankCashID = '{$bankCashID}' AND Date <= '{$tillDate}'
+                ";
+                $res = mysql_query($sql) or die(mysql_error());
+                $row = mysql_fetch_assoc($res);
+                return floatval($row['Balance']);
+            }
+            
+        
+    }
 }
+
 
 // ---------------- Start Output Buffer ----------------
 ob_start();
@@ -70,7 +255,6 @@ ob_start();
     <title>Daily Received & Payment Report</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-    /*body { font-size: 14px; }*/
     .table th,
     .table td {
         vertical-align: middle;
@@ -118,6 +302,7 @@ ob_start();
 </head>
 
 <body>
+<body>
 
     <div style="width: 95%; margin: auto;">
         <p style="font-size: 16px">Printing Date & Time: <?= date('F j, Y - h:i A'); ?></p>
@@ -125,16 +310,17 @@ ob_start();
 
     <div style="width: 95%; margin: auto;">
         <div class="row align-items-center mb-3">
-            <div class="col-md-2 text-center">
+            <div class="m-auto text-center" style="position: absolute; width: 100px;">
                 <img src="./upload/<?= $Settings["logo"] ?>" height="70px" alt="Company Logo">
             </div>
-            <div class="col-md-9 text-center">
+            <div class="col-md-12 text-center">
                 <h4 class="bold"><?= $Settings["CompanyName"] ?></h4>
                 <p style="font-size: 18px;"><?= $Settings["Address"] ?></p>
             </div>
         </div>
-
-        <h4 class="text-center my-3">Daily Received & Payment Report All Project</h4>
+    <div class="projectName text-center m-b-30 m-t-30" style=" background: #8BC34A; padding: 21px; " bis_skin_checked="1">
+                <h4 class="text-center my-3">Date Wise Bank Statement Report <?php if($CategoryData != null){ echo " - ".$CategoryData['Name']; }else{ echo "All Project"; }?></h4>
+    </div>
         <p class="text-center"><strong>From:</strong> <?= HumanReadAbleDateFormat($FromDate) ?> <strong>To:</strong>
             <?= HumanReadAbleDateFormat($ToDate) ?></p>
 
@@ -143,18 +329,18 @@ ob_start();
                 <!-- Bank/Cash Opening Balances -->
                 <?php foreach ($AllBankCashes as $BankAndCash): ?>
                 <tr class="bold" style="">
-                    <td colspan="8" class="text-right">
+                    <td colspan="9" class="text-right">
                         <?= $BankAndCash['AccountTitle'] ?> Opening Balance:
                     </td>
                     <td colspan="2" class="text-center">
-                        <?= BangladeshiCurencyFormat(getAccountBalanceTill($BankAndCash['BankCashID'], $prevDate)) ?>
+                        <?= BangladeshiCurencyFormat(getAccountBalanceTill($BankAndCash['BankCashID'], $prevDate, $CategoryID)) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
 
                 <!-- Overall Opening -->
                 <tr class="bg-light-green bold">
-                    <td colspan="8" class="text-right">Opening Balance:</td>
+                    <td colspan="9" class="text-right">Opening Balance:</td>
                     <td colspan="2" class="text-center"><?= BangladeshiCurencyFormat($openingBalance) ?></td>
                 </tr>
                 <tr>
@@ -166,6 +352,7 @@ ob_start();
                     <th>Voucher No</th>
                     <th>Type of Voucher</th>
                     <th>Bank/Cash</th>
+                    <th>Project Name</th>
                     <th>Dr. Amount</th>
                     <th>Cr. Amount</th>
                 </tr>
@@ -175,18 +362,26 @@ ob_start();
 
                 <!-- Transactions -->
                 <?php $sl = 1; while ($row = mysql_fetch_assoc($resTrans)):
-                $BankName = SQL_Select("BankCash","{$row['BankCashID']}","",true);
-//            print_r($BankName);
+                $PName = SQL_Select("category","CategoryID='{$row['ProjectID']}'","",true);
+                $BankName = SQL_Select("BankCash","{$row['BankCashID']}");
+                foreach ($AllBankCashes as $BankAndCash) {
+                    if ($BankAndCash['BankCashID'] == $row['BankCashID']) {
+                        $BankName = $BankAndCash;
+                        break;
+                    }
+                }
+
                 ?>
                 <tr>
                     <td class="text-center"><?= $sl++ ?></td>
                     <td class="text-center"><?= HumanReadAbleDateFormat($row['Date']) ?></td>
-                    <td><?= $row['HeadOfAccountName'] ?></td>
-                    <td><?= $row['Description'] ?></td>
+                    <td style=" width: 100px;"><?= $row['HeadOfAccountName'] ?></td>
+                    <td style=" width: 226px;"><?= $row['Description'] ?></td>
                     <td class="text-center"><?= $row['ChequeNumber'] ?></td>
                     <td class="text-center"><?= $row['VoucherNo'] ?></td>
                     <td class="text-center"><?= $row['VoucherType'] ?></td>
                     <td class="text-center"><?= $BankName['AccountTitle'] ?></td>
+                    <td class="text-center"><?= $PName['Name'] ?></td>
                     <td class="text-right"><?= BangladeshiCurencyFormat($row['dr']) ?></td>
                     <td class="text-right"><?= BangladeshiCurencyFormat($row['cr']) ?></td>
                 </tr>
@@ -194,30 +389,30 @@ ob_start();
 
                 <!-- Totals -->
                 <tr class="bold" style="background: rgba(63,81,181,0.56);color: #000000">
-                    <td colspan="8" class="text-right">Total:</td>
+                    <td colspan="9" class="text-right">Total:</td>
                     <td class="text-right"><?= BangladeshiCurencyFormat($totalDr) ?></td>
                     <td class="text-right"><?= BangladeshiCurencyFormat($totalCr) ?></td>
                 </tr>
                 <tr class="bg-light-gray bold">
-                    <td colspan="8" class="text-right">Balance (Cr - Dr):</td>
+                    <td colspan="9" class="text-right">Balance (Cr - Dr):</td>
                     <td colspan="2" class="text-center"><?= BangladeshiCurencyFormat($balance) ?></td>
                 </tr>
 
                 <!-- Bank/Cash Closing Balances -->
                 <?php foreach ($AllBankCashes as $BankAndCash): ?>
                 <tr class="bold">
-                    <td colspan="8" class="text-right">
+                    <td colspan="9" class="text-right">
                         <?= $BankAndCash['AccountTitle'] ?> Closing Balance:
                     </td>
                     <td colspan="2" class="text-center">
-                        <?= BangladeshiCurencyFormat(getAccountBalanceTill($BankAndCash['BankCashID'], $ToDate)) ?>
+                        <?= BangladeshiCurencyFormat(getAccountBalanceTill($BankAndCash['BankCashID'], $ToDate, $CategoryID)) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
 
                 <!-- Overall Closing -->
                 <tr class="bold" style="background: #3F51B5;color: white">
-                    <td colspan="8" class="text-right">Closing Balance:</td>
+                    <td colspan="9" class="text-right">Closing Balance:</td>
                     <td colspan="2" class="text-center"><?= BangladeshiCurencyFormat($closingBalance) ?></td>
                 </tr>
 

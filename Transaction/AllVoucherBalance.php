@@ -1,8 +1,8 @@
 <?php
 $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
-$_POST["FromDate"] = '2025-08-11';
-$_POST["ToDate"]= '2025-08-11';
-$_POST["CategoryID"]= 23;
+$_POST["FromDate"] = '2025-08-23';
+$_POST["ToDate"]= '2025-08-23';
+$_POST["CategoryID"]= 25;
 
 $FromDate = isset($_POST["FromDate"]) ? $_POST["FromDate"] : null;
 $ToDate = isset
@@ -56,7 +56,7 @@ $MainContent = '
             <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr>
-                        <th>TransactionID</th>
+                        <th>Voucher No</th>
                         <th>Customer</th>
                         <th>Bank/Cash Name</th>
                         <th>Head of Account Name</th>
@@ -80,7 +80,7 @@ if (!empty($CrData)) {
 
         $MainContent .= '
             <tr>
-                <td>' . $row['TransactionID'] . '</td>
+                <td>' . $row['VoucherNo'] . '</td>
                 <td>' . htmlspecialchars($row['CustomerName']) . '</td>
                 <td>' . htmlspecialchars($row['BankCashName']) . '</td>
                 <td>' . htmlspecialchars($row['HeadOfAccountName']) . '</td>
@@ -250,7 +250,6 @@ $MainContent .= '
                 <thead>
                     <tr>
                         <th>TransactionID</th>
-                        <th>Bank/Cash Name</th>
                         <th>Head of Account Name</th>
                         <th>Date</th>
                         <th>Type</th>
@@ -273,7 +272,6 @@ if (!empty($JournalData)) {
         $MainContent .= '
             <tr>
                 <td>' . $row['TransactionID'] . '</td>
-                <td>' . $row['BankCashName'] . '</td>
                 <td>' . htmlspecialchars($row['HeadOfAccountName']) . '</td>
                 <td>' . $row['Date'] . '</td>
                 <td>' . $row['VoucherType'] . '</td>
@@ -284,14 +282,14 @@ if (!empty($JournalData)) {
     }
     $MainContent .= '
             <tr class="font-weight-bold bg-success text-white">
-                <td colspan="5" class="text-right">TOTAL</td>
+                <td colspan="4" class="text-right">TOTAL</td>
                 <td class="text-right">' . number_format($totalDr, 2) . '</td>
                 <td class="text-right">' . number_format($totalCr, 2) . '</td>
             </tr>
     ';
 } else {
     $MainContent .= '
-        <tr><td colspan="7" class="text-center">No data found</td></tr>
+        <tr><td colspan="6" class="text-center">No data found</td></tr>
     ';
 }
 

@@ -162,23 +162,15 @@ $MainContent .= '
         </div>
     </div>
 
-    <!-- EMI Report -->
+<!-- EMI Report -->
     <div class="col">
         <div class="card">
             <div class="card-header text-center bg-success text-white">EMI Report</div>
             <div class="card-body">
                 <form method="POST" action="' . ApplicationURL("SalesReport", "EMIReport&NoHeader&NoFooter") . '">
                     <div class="mb-3">
-                        <label class="form-label">Division</label>
-                        <select name="Division" class="form-select">
-                            <option value="" disabled>Select a division</option>
-                            <option value="Corporate">Corporate</option>
-                            <option value="SSD">SSD</option>
-                            <option value="SED">SED</option>
-                            <option value="CST">CST</option>
-                            <option value="Founder">Founder</option>
-                            <option value="Referral">Referral</option>
-                        </select>
+                        <label class="form-label">Project Name</label>
+                        ' . CCTL_ProductsCategory("CategoryID", $TheEntityName["CategoryID"], "", true) . '
                     </div>
                     <div class="mb-3">
                         <label class="form-label">From Date</label>

@@ -322,8 +322,8 @@ $MainContent .= '
                     mainHandler();
                     
                     
-                    Fields.QtyDom.type="number";
-                    Fields.RateDom.type="number";
+                    Fields.QtyDom.type="text";
+                    Fields.RateDom.type="text";
                     Fields.ValueDom.type="number";
                     
                     Fields.reSpanDetailsDom.style.display="none";

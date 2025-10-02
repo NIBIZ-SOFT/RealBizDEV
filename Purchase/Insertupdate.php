@@ -17,7 +17,7 @@ $selectedField = "";
 $itemsHtmls = "";
 if (!empty($TheEntityName)) {
 
-    $disabled = "disabled";
+    $disabled = "readonly";
 
     $EditItems = json_decode($TheEntityName["Items"]);
 
@@ -74,6 +74,16 @@ if ($TheEntityName["Confirm"] == "Confirm") {
 } else if ($TheEntityName["Confirm"] == "Not Confirm") {
     $notConfirm = "checked";
 }
+
+$VendorHead = SQL_Select("ExpenseHead");
+
+$VendorHeadName = "";
+$SelectedVendorHeadName = "";
+foreach ($VendorHead as $head) {
+    $SelectedVendorHeadName = ($TheEntityName["VendorHead"] == $head["ExpenseHeadID"]) ? "selected" : "";
+    $VendorHeadName .= '<option value="' . $head["ExpenseHeadID"] . '" '. $SelectedVendorHeadName.'>' . $head["ExpenseHeadName"] . '</option>';
+}
+// print_r($TheEntityName["VendorHead"]);
 $MainContent .= '
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-primary text-white">
@@ -90,13 +100,24 @@ $MainContent .= '
                     <div class="col-md-6">
                         ' . CCTL_Vendor("VendorID", $TheEntityName["VendorID"], "", true) . '
                     </div>
-            
+
                     <div class="col-md-6">
                         <label class="form-label">Confirm Order</label>
-                        <select class="form-select" ' . $disabled . ' name="confirmRequisitonId" id="confirmRequisitonId">
+                        <select class="form-select" ' . $disabled . ' name="confirmRequisitonId" id="confirmRequisitonId" required>
                             <option value="">Select Confirmed Order</option>
                             ' . $selectedField . '
                         </select>
+                    </div>
+                    <input type="hidden" name="confirmRequisitonIdForEdit" value="' . $TheEntityName["confirmRequisitonName"] . '">
+                    <input type="hidden" name="PurchaseConfirmID" value="' . $TheEntityName["PurchaseConfirmID"] . '">
+            
+                    <div class="col-md-6">
+                        <label class="form-label">Vendor Head Of A/C</label>
+                        <select class="form-select" name="VendorHead" id="VendorHead" required>
+                            <option value="">Select Vendor Head</option>
+                            ' . $VendorHeadName . '
+                        </select>
+
                     </div>
             
                     <div class="col-md-6">
@@ -106,7 +127,7 @@ $MainContent .= '
             
                     <div class="col-md-6">
                         <label class="form-label">Issuing Date</label>
-                        <input class="form-control" value="' . $TheEntityName["IssuingDate"] . '" name="IssuingDate" type="date">
+                        <input class="form-control" value="' . $TheEntityName["IssuingDate"] . '" name="IssuingDate" type="date" required>
                     </div>
             
                     <div class="col-md-6">
@@ -134,7 +155,7 @@ $MainContent .= '
                         <input class="form-control" value="' . $TheEntityName["Note"] . '" name="Note" type="text">
                     </div>
             
-                    <div class="col-12">
+                    <div class="col-6">
                         <label class="form-label">Subject</label>
                         <input class="form-control" value="' . $TheEntityName["Subject"] . '" name="Subject" type="text">
                     </div>
@@ -174,7 +195,7 @@ $MainContent .= '
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100" >Add Purchase </button>
+                    <button type="submit" onclick="alert(\'It Will Create Auto Journal Voucher & Vendor Assaign ?\')" class="btn btn-success w-100" >Add Purchase </button>
             </div>
         </form>
     </div>
@@ -185,6 +206,7 @@ $MainContent .= '
 ';
 $MainContent .= <<<SCRIPT
 <script>
+
 $(function() {
     // When Category changes, update Confirm Requisition options
     $(document).on("change", "select[name=CategoryID]", function () {
@@ -279,11 +301,11 @@ $(function() {
                                 </div>
                                 <div class="col-md-3 col-6">
                                     <label class="form-label">Rate</label>
-                                    <input type="text" name="items[\${index}][requisitionRate]" value="\${rate}" class="form-control" readonly thisRequisitonRate="true">
+                                    <input type="number" name="items[\${index}][requisitionRate]" value="\${rate}" class="form-control" readonly thisRequisitonRate="true">
                                 </div>
                                 <div class="col-md-6 col-12 mt-2">
                                     <label class="form-label">Amount</label>
-                                    <input type="text" name="items[\${index}][requisitionAmount]" value="\${newAmount.toFixed(2)}" class="form-control totalRequisitonAmount" readonly thisRequisitionTotal="true">
+                                    <input type="number" name="items[\${index}][requisitionAmount]" value="\${newAmount.toFixed(2)}" class="form-control totalRequisitonAmount" readonly thisRequisitionTotal="true">
                                 </div>
                             </div>
                         </div>`;

@@ -56,6 +56,15 @@
 			$Where
 			);
 
+		$ProductINSERTUPDATE = SQL_InsertUpdate(
+			$Entity = "Products",
+			$TheEntityNameData = array(
+				"ProductsIsSold" => 1,
+			),
+			$Where = "ProductsID = {$_POST["ProductID"]}"
+		);
+
+
 
 
 

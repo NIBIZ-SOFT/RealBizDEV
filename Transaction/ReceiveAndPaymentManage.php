@@ -32,6 +32,14 @@ $MainContent.='
                 <div class="card-body">
                     <form method="POST" action="' .ApplicationURL("Transaction","DailyRP&NoHeader&NoFooter"). '">
                         <div class="mb-3">
+                            <label class="form-label">Project Name</label>
+                            '.CCTL_ProductsCategory($Name = "CategoryID", $TheEntityName["CategoryID"], $Where = "", $PrependBlankOption = true).'
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cash or Bank</label>
+                            ' . CCTL_BankCash("BankCashID", "", "", true) . '
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">From Date</label>
                             <input type="date" class="form-control" name="FromDate" placeholder="YYYY-MM-DD">
                         </div>

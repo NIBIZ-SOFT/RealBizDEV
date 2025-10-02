@@ -1,7 +1,8 @@
 <?php
 $Settings = SQL_Select("Settings", "SettingsID=1", "", true);
 $Balancesheet = SQL_Select("balancesheet", "BalanceSheetIsActive=1");
-
+$FromDate   = isset($_REQUEST["FromDate"])   ? $_REQUEST["FromDate"]   : '0000-00-00';
+$ToDate     = isset($_REQUEST["ToDate"])     ? $_REQUEST["ToDate"]     : '0000-00-00';
 // Currency format function
 function format_currency($amount) {
     return number_format((float)$amount, 2);
@@ -40,7 +41,8 @@ $assetsTotal = 0;
     <table id="myTable" class="mt-4">
         <tr>
             <th>Particulars</th>
-            <th style="text-align:center;">Jan 01, 2025 To Apr 30, 2025 (Tk)</th>
+            <th style="text-align:center;">From: <?php echo $FromDate.' To:  '.$ToDate.?></th>
+            
         </tr>
 
         <!-- ===== Equity FIRST ===== -->
@@ -68,8 +70,8 @@ $assetsTotal = 0;
                         if (!empty($ids)) {
                             $idList = implode(',', $ids);
 
-                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
-                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
+                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
 
                             $DR = mysql_fetch_array($ResultDr);
                             $CR = mysql_fetch_array($ResultCr);
@@ -77,8 +79,8 @@ $assetsTotal = 0;
                             $Equity += $groupTotal;
 
                             foreach ($Heads as $Head) {
-                                $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
-                                $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
+                                $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                                $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
                                 $DR = mysql_fetch_array($ResultDr);
                                 $CR = mysql_fetch_array($ResultCr);
                                 $net = $CR['total_cr'] - $DR['total_dr'];
@@ -122,8 +124,8 @@ $assetsTotal = 0;
                     if (!empty($ids)) {
                         $idList = implode(',', $ids);
 
-                        $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
-                        $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
+                        $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                        $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
 
                         $DR = mysql_fetch_array($ResultDr);
                         $CR = mysql_fetch_array($ResultCr);
@@ -131,8 +133,8 @@ $assetsTotal = 0;
                         $capitalLiabilitiesTotal += $groupTotal;
 
                         foreach ($Heads as $Head) {
-                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
-                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
+                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
                             $DR = mysql_fetch_array($ResultDr);
                             $CR = mysql_fetch_array($ResultCr);
                             $net = $CR['total_cr'] - $DR['total_dr'];
@@ -176,8 +178,8 @@ $assetsTotal = 0;
                     if (!empty($ids)) {
                         $idList = implode(',', $ids);
 
-                        $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
-                        $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList)");
+                        $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                        $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID IN ($idList) AND Date BETWEEN '$FromDate' AND '$ToDate'");
 
                         $DR = mysql_fetch_array($ResultDr);
                         $CR = mysql_fetch_array($ResultCr);
@@ -185,8 +187,8 @@ $assetsTotal = 0;
                         $assetsTotal += $groupTotal;
 
                         foreach ($Heads as $Head) {
-                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
-                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']}");
+                            $ResultDr = mysql_query("SELECT SUM(dr) AS total_dr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
+                            $ResultCr = mysql_query("SELECT SUM(cr) AS total_cr FROM tbltransaction WHERE HeadOfAccountID = {$Head['ExpenseHeadID']} AND Date BETWEEN '$FromDate' AND '$ToDate'");
                             $DR = mysql_fetch_array($ResultDr);
                             $CR = mysql_fetch_array($ResultCr);
                             $net = $DR['total_dr'] - $CR['total_cr'];
