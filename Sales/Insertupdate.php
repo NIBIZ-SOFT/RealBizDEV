@@ -77,7 +77,7 @@ $MainContent .= '
                     <label class="form-label">Product</label>
                     <select name="ProductID" id="ProductID" class="form-select" required>
                         <option value="">-- Select Product --</option>
-                        <option value="' . $TheEntityName["ProductID"] . '" selected>' . $ProductNamex["floorNumber"] . "-" . $ProductNamex["FlatType"] . '</option>
+                        <option value="' . $TheEntityName["ProductID"] . '" selected>' . $ProductNamex["FloorNumber"] . "-" . $ProductNamex["FlatType"] . '</option>
                     </select>
                     <input type="hidden" name="ProductName" id="HideProductName" value="' . $TheEntityName["ProductName"] . '">
                 </div>

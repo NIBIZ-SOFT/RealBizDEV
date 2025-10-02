@@ -20,33 +20,29 @@ $MainContent .= CTL_Datagrid(
 
 );
 
-$JVINfo = SQL_Select("journalvoucher where VendorID={$VendorID} and ProjectID={$CategoryID} and JournalVoucherIsDisplay=0  and cr>0   ORDER BY VoucherNo desc","","");
+$JVINfo = SQL_Select("journalvoucher where VendorID={$VendorID} and ProjectID={$CategoryID} and JournalVoucherIsDisplay=0  and cr>0   ORDER BY VoucherNo desc","","",true);
 
+$AdvancePaidContructors = SQL_Select("transaction where VendorID={$VendorID} and ProjectID={$CategoryID} and BankCashID >0 and dr>0  ORDER BY TransactionID desc");
+// print_r($AdvancePaidContructors);
 $sl = 1;
 $totalDr=0;
-foreach($JVINfo as $ThisJVINfo){
-    $AdvancePaidContructors = SQL_Select("transaction where VendorID={$VendorID} and ProjectID={$CategoryID} and HeadOfAccountID={$ThisJVINfo["HeadOfAccountID"]} and dr>0  ORDER BY TransactionID desc");
+foreach ($AdvancePaidContructors as $AdvancePaidContructor) {
 
+    $tr .= '
+        <tr> 
+            <td>' . $sl . '</td>
+            <td>' . HumanReadAbleDateFormat($AdvancePaidContructor["Date"]) . '</td>
+            <td>' . $AdvancePaidContructor["HeadOfAccountName"] . '</td>
+            <td>' . $AdvancePaidContructor["BillNo"] . '</td>
+            <td>' . $AdvancePaidContructor["VoucherNo"] . '</td>
+            <td>' . $AdvancePaidContructor["BankCashName"] . '</td>
+            <td>' . BangladeshiCurencyFormat($AdvancePaidContructor["dr"]) . '</td>
+            
+        </tr>
+    ';
+    $sl++;
 
-    foreach ($AdvancePaidContructors as $AdvancePaidContructor) {
-
-        $tr .= '
-            <tr> 
-                <td>' . $sl . '</td>
-                <td>' . HumanReadAbleDateFormat($AdvancePaidContructor["Date"]) . '</td>
-                <td>' . $AdvancePaidContructor["HeadOfAccountName"] . '</td>
-                <td>' . $AdvancePaidContructor["BillNo"] . '</td>
-                <td>' . $AdvancePaidContructor["VoucherNo"] . '</td>
-                <td>' . $AdvancePaidContructor["BankCashName"] . '</td>
-                <td>' . BangladeshiCurencyFormat($AdvancePaidContructor["dr"]) . '</td>
-                
-            </tr>
-        ';
-        $sl++;
-
-        $totalDr +=$AdvancePaidContructor["dr"];
-
-    }
+    $totalDr +=$AdvancePaidContructor["dr"];
 
 }
 

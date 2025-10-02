@@ -39,23 +39,37 @@
 	if(isset($_GET["DeleteConfirm"]))SQL_Delete($Entity="{$Entity}", $Where="{$Entity}ID = {$_REQUEST[$Entity."ID"]} AND {$Entity}UUID = '{$_REQUEST[$Entity."UUID"]}'");
 
 
-$MainContent = '
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white d-flex align-items-center">
-        <i class="bi bi-list me-2"></i>
-        <h4 class="mb-0">Stock Manage</h4>
-    </div>
-    <div class="card-body">
-        <h3>Total Stock Value: <span class="text-primary">'.$stockAmount.'</span> TK</h3>
-        <h3>Used Stock Value: <span class="text-danger">'.$usedStockAmount.'</span> TK</h3>
-        <h3>Present Stock Value: <span class="text-success">'.$currentAmount.'</span> TK</h3>
-        <a href="index.php?Theme=default&Base=UsedStock&Script=Manage" class="btn btn-outline-primary">
-            Used Stock
-        </a>
-    </div>
-</div>
-';
+$MainContent .='
+	
+	<div class="widget-box">
+	
+	<div class="widget-title">
+            <span class="icon">
+                <i class="icon-th-list"></i>
+            </span>				
+            <h5>Stock Manage</h5>
+        </div>
+        <div class="widget-content">		
+			<h4>Total Stock Value: <span style="color:#0048CC;">'.$stockAmount.'</span> (TK) . Used Stock value: <span style="color:red;">'.$usedStockAmount.'</span> (TK). Present Stock Value: <span style="color:green;">'.$currentAmount.'</span> (TK)</h4>
+        </div>
+	</div>
 
+    <div class="widget-box">
+        <div class="widget-title">
+            <span class="icon">
+                <i class="icon-th-list"></i>
+            </span>				
+            <h5>Action Buttons</h5>
+        </div>
+        <div class="widget-content">		
+			
+            <a  href="index.php?Theme=default&Base=UsedStock&Script=Manage" class="btn" >Used Stock</a>
+           
+        </div>	
+				
+	</div>    
+	    
+	';
 
 
 

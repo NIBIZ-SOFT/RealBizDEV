@@ -20,10 +20,10 @@ if ($_POST["FreeText"] != "")
 // DataGrid
 $MainContent .= CTL_Datagrid(
     $Entity,
-    $ColumnName = array("CategoryName","FlatType","BuildArea","LandArea","UnitPrice", ),
-    $ColumnTitle = array("Project's Name","Package Name","Build Area","Land Area","Price"),
-    $ColumnAlign = array("left", "left","left","left","left" ),
-    $ColumnType = array("text", "text", "text", "text", "text"),
+    $ColumnName = array("CategoryName","FlatType","BuildArea","LandArea","UnitPrice", "ProductsIsSold"),
+    $ColumnTitle = array("Project's Name","Package Name","Build Area","Land Area","Price", "Sold/Available"),
+    $ColumnAlign = array("center", "left","left","center","center", "center"),
+    $ColumnType = array("text", "text", "text", "text", "text", "yes/no"),
     $Rows = SQL_Select($Entity = "{$Entity}", $Where, $OrderBy = "{$_REQUEST["SortBy"]} {$_REQUEST["SortType"]}", $SingleRow = false, $RecordShowFrom = $_REQUEST["RecordShowFrom"], $RecordShowUpTo = $Application["DatagridRowsDefault"], $Debug = false),
     $SearchHTML = "" . CTL_InputText($Name = "FreeText", "", "", 26, $Class = "DataGridSearchBox") . " ",
     $ActionLinks = true,

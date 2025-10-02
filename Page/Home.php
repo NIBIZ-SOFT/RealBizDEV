@@ -99,6 +99,11 @@ $MainContent.='
         .revenue {
             background: linear-gradient(135deg, #82b1ff, #448aff);
         }
+
+        a {
+            text-decoration: none!important;
+            color: inherit;
+        }
     </style>
     
 ';
@@ -149,147 +154,171 @@ $MainContent.='
             </div>
             
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-map-marker-alt fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Location</h5>
-                            <small>Total: '.$TLocation["Total"].'</small>
+                <a href="index.php?Theme=default&Base=ProjectLocation&Script=Manage">
+                    <div class="card bg-primary text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-map-marker-alt fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Location</h5>
+                                <small>Total: '.$TLocation["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-danger text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-industry fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Projects</h5>
-                            <small>Total: '.$TProject["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Category&Script=Manage">
+                    <div class="card bg-danger text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-industry fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Projects</h5>
+                                <small>Total: '.$TProject["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-warning text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-city fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Products</h5>
-                            <small>Total: '.$TProduct["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Products&Script=Manage&ProductType=Land">
+                    <div class="card bg-warning text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-city fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Products</h5>
+                                <small>Total: '.$TProduct["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-info text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-user-shield fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Customers</h5>
-                            <small>Total: '.$TCustomer["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Customer&Script=Manage">
+                    <div class="card bg-info text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-user-shield fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Customers</h5>
+                                <small>Total: '.$TCustomer["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-success text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-clipboard-check fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Sales</h5>
-                            <small>Total: '.$TSales["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Sales&Script=Manage">
+                    <div class="card bg-success text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-clipboard-check fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Sales</h5>
+                                <small>Total: '.$TSales["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-people-carry fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Vendors</h5>
-                            <small>Total: '.$TVendor["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Vendor&Script=Manage">
+                    <div class="card bg-primary text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-people-carry fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Vendors</h5>
+                                <small>Total: '.$TVendor["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-primary bg-info text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-drafting-compass fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Constructors</h5>
-                            <small>Total: '.$TContructor["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Contructor&Script=Manage">
+                    <div class="card bg-primary bg-info text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-drafting-compass fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Contractors</h5>
+                                <small>Total: '.$TContructor["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-success text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-shopping-bag fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Requisition</h5>
-                            <small>Total: '.$TPurchaseRequisition["Total"].'</small>
+                <a href="index.php?Theme=default&Base=PurchaseRequisition&Script=Manage">
+                    <div class="card bg-success text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-shopping-bag fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Requisition</h5>
+                                <small>Total: '.$TPurchaseRequisition["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-dollar-sign fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Credit</h5>
-                            <small>Total: '.$TCredit.'</small>
+                <a href="index.php?Theme=default&Base=CrVoucher&Script=Manage">
+                    <div class="card bg-primary text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-dollar-sign fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Credit</h5>
+                                <small>Total: '.$TCredit.'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-danger text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-dollar-sign fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Debit</h5>
-                            <small>Total: '.$TDebit.'</small>
+                <a href="index.php?Theme=default&Base=DrVoucher&Script=Manage">
+                    <div class="card bg-danger text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-dollar-sign fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Debit</h5>
+                                <small>Total: '.$TDebit.'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-warning text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-id-badge fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Employees</h5>
-                            <small>Total: '.$TEmployee["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Employee&Script=Manage">
+                    <div class="card bg-warning text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-id-badge fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Employees</h5>
+                                <small>Total: '.$TEmployee["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-info text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-users fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Users</h5>
-                            <small>Total: '.$TUser["Total"].'</small>
+                <a href="index.php?Theme=default&Base=Users&Script=Manage">
+                    <div class="card bg-info text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-users fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Users</h5>
+                                <small>Total: '.$TUser["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -300,39 +329,41 @@ $MainContent.='
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-info text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-headset fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Leads</h5>
-                            <small>Total: '.$TotalLeads["Total"].'</small>
+                <a href="index.php?Theme=default&Base=CRM&Script=Manage">
+                    <div class="card bg-info text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-headset fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Leads</h5>
+                                <small>Total: '.$TotalLeads["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-primary text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-headset fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Leads</h5>
-                            <small>Total: '.$TotalTodaysLeads["Total"].'</small>
+                    <div class="card bg-primary text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-headset fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Today\'s Leads</h5>
+                                <small>Total: '.$TotalTodaysLeads["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">
-                <div class="card bg-secondary text-white shadow">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="fas fa-tasks fa-2x me-3"></i>
-                        <div>
-                            <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Tasks</h5>
-                            <small>Total: '.$TotalTask["Total"].'</small>
+                    <div class="card bg-secondary text-white shadow">
+                        <div class="card-body d-flex align-items-center">
+                            <i class="fas fa-tasks fa-2x me-3"></i>
+                            <div>
+                                <h5 style="font-size: .925rem ; font-weight: 600; color:white" class="card-title mb-0">Tasks</h5>
+                                <small>Total: '.$TotalTask["Total"].'</small>
+                            </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 mb-4">

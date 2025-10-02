@@ -42,19 +42,23 @@ if ($ErrorUserInput["_Error"]) {
     } else {
         $_POST["ContructorID"] = 0;
     }
-
     if (!$UpdateMode) {
-        $voucherNo = !empty($journalvoucher) ? $journalvoucher[0]["VoucherNo"] + 2 : 1;
+            $lastVoucher = SQL_Select("journalvoucher", "1 ORDER BY VoucherNo DESC LIMIT 1");
+            $voucherNo = !empty($lastVoucher) ? intval($lastVoucher[0]["VoucherNo"]) + 1 : 1;
+            while (!empty(SQL_Select("journalvoucher", "VoucherNo = {$voucherNo}"))) {
+                $voucherNo++;
+            }
     } else {
         $voucherDetails = SQL_Select("journalvoucher where VoucherNo={$_REQUEST["VoucherNo"]}");
         $voucherNo = $_POST["VoucherNo"];
 
         if (!empty($voucherDetails)) {
             SQL_Delete("journalvoucher where VoucherNo={$voucherNo}");
+            SQL_Delete("transaction where VoucherNo={$voucherNo}");
         }
     }
 
-    $_POST["VoucherNo"] = $voucherNo;
+    
 
     // === DEBIT ENTRIES ===
     if (!empty($_POST["FormHeadOfAccountID"]["dr"])) {
