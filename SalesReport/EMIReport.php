@@ -78,9 +78,11 @@ $totalPending = 0;
                     <th>Seller Name</th>
                     <th>This Month Term</th>
                     <th>This Month Scheduled (Tk)</th>
+                    <th>This Month Received (Tk)</th>
+
 
                     <!-- <th>All Term</th> -->
-                    <th>Total Scheduled Amount (Tk)</th>
+                    <th>Total Pending OF Scheduled Amount (Tk)</th>
 
                     <th>Total Received (Tk)</th>
                     <th>Net Price (Tk)</th>
@@ -134,6 +136,7 @@ $totalPending = 0;
                                 SUM(SP.PayAbleAmount) AS DueAmount,
                                 MAX(SP.Date) AS DueDate,
                                 IFNULL(SUM(ASP.ActualReceiveAmount), 0) AS TotalReceivedAmount,
+                                SUM(CASE WHEN ASP.DateOfCollection BETWEEN '$fromDate' AND '$toDate' THEN ASP.ActualReceiveAmount ELSE 0 END) AS ReceivedAmount,
                                 P.NetSalesPrice - IFNULL(SUM(ASP.ActualReceiveAmount), 0) AS PendingAmount
                             FROM 
                                 tblschedulepayment SP
@@ -166,6 +169,13 @@ $totalPending = 0;
                         while ($row = mysql_fetch_assoc($pendingResult)) {
                             if ($tblsales[0]['ProjectID'] != $project) continue;
                             // <td style='text-align: center;'>{$row['InstallmentTerm']}</td>
+                            $Paid = "";
+                            if ($row['ThisMonthDue'] == $row['ReceivedAmount']) {
+                                // continue;
+                                $Paid = "style='background-color:rgb(8, 255, 65); text-align: center; width: 115px';";
+                            } else if ($row['ReceivedAmount'] > 0) {
+                                $Paid = "style='background-color:rgb(212, 117, 22); text-align: center; width: 115px;'";
+                            }
                             echo "<tr>
                         <td style='text-align: center;'>{$sl}</td>
                         <td>CID:{$tblsales[0]['CustomerID']} - {$customerName}</td>
@@ -174,6 +184,8 @@ $totalPending = 0;
                         <td>ID:{$tblsales[0]['SellerID']} - {$sellerName}</td>
                         <td style='text-align: center;'>{$row['ThisMonthTerm']}</td>
                         <td style='text-align: center; width: 115px;'>" . BangladeshiCurencyFormat($row['ThisMonthDue']) . "</td>
+
+                        <td {$Paid}'>" . BangladeshiCurencyFormat($row['ReceivedAmount']) . "</td>
 
                         <td style='text-align: center; width: 115px;'>" . BangladeshiCurencyFormat($row['DueAmount']) . "</td>
 
@@ -190,6 +202,7 @@ $totalPending = 0;
                             $NetSalesPrice += $row['NetSalesPrice'];
                             $totalPending += $row['PendingAmount'];
                             $cumulativeAllPendingAmount += $row['PendingAmount'];
+                            $cumulativeTotalReceivedAmount += $row['ReceivedAmount'];
                         }
 
                         if ($totalPending > 0) {
@@ -211,6 +224,7 @@ $totalPending = 0;
                 <tr>
                     <td colspan="6" class="text-end fw-bold">Total =</td>
                     <td style='text-align: center; width: 115px;' class="fw-bold"><?= BangladeshiCurencyFormat($ThisMonthDue) ?></td>
+                    <td style='text-align: center; width: 115px;' class="fw-bold"><?= BangladeshiCurencyFormat($cumulativeTotalReceivedAmount) ?></td>
                     <td style='text-align: center; width: 115px;' class="fw-bold"><?= BangladeshiCurencyFormat($totalDue) ?></td>
                     <td style='text-align: center; width: 115px;' class="fw-bold"><?= BangladeshiCurencyFormat($TotalReceivedAmount) ?></td>
                     <td style='text-align: center; width: 115px;' class="fw-bold"><?= BangladeshiCurencyFormat($NetSalesPrice) ?></td>
