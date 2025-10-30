@@ -103,8 +103,8 @@ if ($ErrorUserInput["_Error"]) {
                 "ProjectID" => $_POST["ProjectID"],
                 "ProjectName" => GetProjectName($_POST["ProjectID"]),
 
-                "CustomerID" => $_POST["CustomerID"],
-                "CustomerName" => GetCustomerName($_POST["CustomerID"]),
+                "CustomerID" => $SaleX["CustomerID"],
+                "CustomerName" => GetCustomerName($SaleX["CustomerID"]),
 
                 "SalesID" => $_REQUEST["SaleID"],
                 "Term" => $_POST["Title"],
@@ -155,6 +155,7 @@ if ($ErrorUserInput["_Error"]) {
                     "dr" => 0,
                     "cr" => $_POST["Amount"],
                     "VoucherNo" => $voucherNo,
+                    "CustomerID" => $SaleX["CustomerID"],
                     "VoucherType" => "CV",
 
                     "{$Entity}IsDisplay" => $_POST["{$Entity}IsDisplay"],
@@ -183,6 +184,7 @@ if ($ErrorUserInput["_Error"]) {
                 "dr" => 0,
                 "cr" => $_POST["Amount"],
                 "VoucherNo" => $voucherNo,
+                "CustomerID" => $SaleX["CustomerID"],
                 "VoucherType" => "CV",
 
                 "{$Entity}IsDisplay" => $_POST["{$Entity}IsDisplay"],

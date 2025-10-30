@@ -75,10 +75,10 @@ if ($_POST["FreeText"] != "")
 // DataGrid
 $MainContent .= CTL_Datagrid(
     $Entity,
-    $ColumnName = array("ProjectName", "Date", "HeadOfAccountName", "BankCashName", "VoucherNo", "VoucherType", "dr", "cr"),
-    $ColumnTitle = array("Project", "Date", "Head Of Account Name", "Made Of Payment", "Voucher No", "Voucher Type", "dr", "cr"),
-    $ColumnAlign = array("left", "left", "left", "left", "left", "left", "left", "left"),
-    $ColumnType = array("text", "date", "text", "text", "text", "text", "text", "text"),
+    $ColumnName = array("ProjectName", "Date", "HeadOfAccountName", "BankCashName", "CustomerID", "VoucherNo", "VoucherType", "dr", "cr"),
+    $ColumnTitle = array("Project", "Date", "Head Of Account Name", "Made Of Payment", "Customer ID", "Voucher No", "Voucher Type", "dr", "cr"),
+    $ColumnAlign = array("left", "left", "left", "left", "left", "left", "left", "left", "left"),
+    $ColumnType = array("text", "date", "text", "text", "text", "text", "text", "text", "text"),
     $Rows = SQL_Select($Entity = "{$Entity}", $Where, $OrderBy = "{$_REQUEST["SortBy"]} {$_REQUEST["SortType"]}", $SingleRow = false, $RecordShowFrom = $_REQUEST["RecordShowFrom"], $RecordShowUpTo = $Application["DatagridRowsDefault"], $Debug = false),
     $SearchHTML = "" . CTL_InputText($Name = "FreeText", "", "", 26, $Class = "DataGridSearchBox") . " ",
     $ActionLinks = true,
