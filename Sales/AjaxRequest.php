@@ -1,5 +1,28 @@
 <?php
 
+// Lightweight server-side search with optional project/category filter
+if (isset($_POST['action']) && $_POST['action'] === 'search_products_lite') {
+    $categoryId = isset($_POST['id']) ? intval($_POST['id']) : 0; // ProjectID/CategoryID
+    $q = isset($_POST['q']) ? trim($_POST['q']) : '';
+    $limit = isset($_POST['limit']) ? max(1, intval($_POST['limit'])) : 50;
+
+    $where = [];
+    if ($categoryId > 0) {
+        $where[] = "CategoryID={$categoryId}";
+    }
+    if ($q !== '') {
+        $safe = addslashes($q);
+        $where[] = "(FloorNumber LIKE '%{$safe}%' OR FlatType LIKE '%{$safe}%' OR CONCAT(FloorNumber,'-',FlatType) LIKE '%{$safe}%')";
+    }
+    $whereClause = count($where) ? (' where ' . implode(' AND ', $where)) : '';
+
+    $all = SQL_Select("Products{$whereClause}");
+    if (!is_array($all)) { $all = []; }
+    $result = array_slice($all, 0, $limit);
+    echo json_encode($result);
+    exit;
+}
+
 if (isset($_POST["id"])){
     $CategoryID=$_POST["id"];
     $allProductByCategories=SQL_Select("Products where CategoryID={$CategoryID}");

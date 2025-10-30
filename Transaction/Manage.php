@@ -12,25 +12,21 @@ SetFormvariable("SortType", "DESC");
 
 if (isset($_REQUEST["ActionNew{$Entity}"])) include "./script/{$_REQUEST["Base"]}/Insertupdate.php";
 // Delete a data
-if (isset($_GET["DeleteConfirm"])) SQL_Delete($Entity = "{$Entity}", $Where = "{$Entity}ID = {$_REQUEST[$Entity."ID"]} AND {$Entity}UUID = '{$_REQUEST[$Entity."UUID"]}'");
+if (isset($_GET["DeleteConfirm"])) SQL_Delete($Entity = "{$Entity}", $Where = "{$Entity}ID = {$_REQUEST[$Entity . "ID"]} AND {$Entity}UUID = '{$_REQUEST[$Entity . "UUID"]}'");
 
 
 // Priority
 
 if (($_SESSION["UserID"] == 107)) {
-
 } else {
 
     $htmlButton .= '
         <a href="' . ApplicationURL("CrVoucher", "Manage") . '" class="btn btn-success m-1">Cr. Voucher</a> 
         <a href="' . ApplicationURL("DrVoucher", "Manage") . '" class="btn btn-danger m-1">Dr. Voucher</a>
-        <a href="' . ApplicationURL("PurchasePayment", "Manage") . '" class="btn btn-danger m-1">Purchase Payment</a>
         <a href="index.php?Theme=default&Base=JournalVoucher&Script=Manage" class="btn btn-primary m-1">Journal Voucher</a>
         <a href="index.php?Theme=default&Base=ContraVoucher&Script=Manage" class="btn btn-warning m-1">Contra Voucher</a>
         <a href="' . ApplicationURL("Transaction", "LedgerManage") . '" class="btn btn-info m-1">Ledger</a>
     ';
-
-
 }
 
 
@@ -50,7 +46,6 @@ $MainContent .= '
                 ' . $htmlButton . '
                 
                     <a href="index.php?Theme=default&Base=Transaction&Script=BalanceSheetManage" class="btn btn-primary m-1">Balance Sheet</a>
-                    <a href="index.php?Theme=default&Base=Transaction&Script=ProfitAndLossAccountManage" class="btn btn-success m-1">Profit & Loss Account</a>
                 
                     <a style=" display: none;" href="index.php?Theme=default&Base=Transaction&Script=CashFlowStatementManage" class="btn btn-info m-1">Cash Flow Statement</a>
                     <a style="" href="index.php?Theme=default&Base=Transaction&Script=ReceiveAndPaymentManage" class="btn btn-warning m-1">Receive & Payment</a>
@@ -74,16 +69,16 @@ if ($_POST["FreeText"] != "")
     $Where .= " and {$_REQUEST["SearchCombo"]} LIKE '%{$_POST["FreeText"]}%'";
 
 
-    
+
 
 
 // DataGrid
 $MainContent .= CTL_Datagrid(
     $Entity,
-    $ColumnName = array("ProjectName", "Date", "HeadOfAccountName", "BankCashName", "VoucherNo", "VoucherType", "dr", "cr"),
-    $ColumnTitle = array("Project", "Date", "Head Of Account Name", "Made Of Payment", "Voucher No", "Voucher Type", "dr", "cr"),
-    $ColumnAlign = array("left", "left", "left", "left", "left", "left", "left", "left"),
-    $ColumnType = array("text", "date", "text", "text", "text", "text", "text", "text"),
+    $ColumnName = array("ProjectName", "Date", "HeadOfAccountName", "BankCashName", "CustomerID", "VoucherNo", "VoucherType", "dr", "cr"),
+    $ColumnTitle = array("Project", "Date", "Head Of Account Name", "Made Of Payment", "Customer ID", "Voucher No", "Voucher Type", "dr", "cr"),
+    $ColumnAlign = array("left", "left", "left", "left", "left", "left", "left", "left", "left"),
+    $ColumnType = array("text", "date", "text", "text", "text", "text", "text", "text", "text"),
     $Rows = SQL_Select($Entity = "{$Entity}", $Where, $OrderBy = "{$_REQUEST["SortBy"]} {$_REQUEST["SortType"]}", $SingleRow = false, $RecordShowFrom = $_REQUEST["RecordShowFrom"], $RecordShowUpTo = $Application["DatagridRowsDefault"], $Debug = false),
     $SearchHTML = "" . CTL_InputText($Name = "FreeText", "", "", 26, $Class = "DataGridSearchBox") . " ",
     $ActionLinks = true,
@@ -95,15 +90,15 @@ $MainContent .= CTL_Datagrid(
 );
 
 // $MainContentssss .= '
-	
+
 // 	    <script> 
-	        
+
 // 	        $("td .btn-primary").hide();
 // 	        $("td .btn-danger").hide();
 // 	        $("tbody tr td img:nth-child(1)").hide();
-	    
+
 // 	    </script>
-	
+
 // 	';
 
 //     // Voucher available But No Transaction =========
@@ -126,13 +121,13 @@ $MainContent .= CTL_Datagrid(
 // foreach ($Drvoucher as $key => $value) {
 //     $voucherID = $value['VoucherNo'];
 //     $Transaction = SQL_Select("transaction", "VoucherType = 'DV' AND VoucherNo = '{$voucherID}'");
-    
+
 //     if (empty($Transaction)) {
 //         echo 'Voucher Type: DV, Voucher ID: '.$voucherID.' আছে কিন্তু Transaction নেই।' . '<br>';
 //         // SQL_Delete("drvoucher where VoucherNo = $voucherID");
 //         $C = SQL_Select("drvoucher where VoucherNo = $voucherID");
 //         print_r($C);
-        
+
 //     }
 // }
 
@@ -199,4 +194,3 @@ $MainContent .= CTL_Datagrid(
 //         $voucherNo = $voucherNo ?: 'N/A';
 //     }
 // }
-?>
