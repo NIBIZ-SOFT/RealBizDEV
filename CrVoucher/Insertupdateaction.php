@@ -90,6 +90,12 @@ if ($ErrorUserInput["_Error"]) {
         }
     }
     if ($_POST["CrVoucherIsDisplay"] == 0 && $_REQUEST["SaleID"] != "") {
+        $Sale = SQL_Select("sales", "SalesID = {$_REQUEST["SaleID"]}", "", true);
+        //if Exist Delete by sale ID customerid and voucher no mrrno
+        $Old = SQL_Select("Actualsalsepayment", "SalesID = '{$_REQUEST["SaleID"]}' and MRRNO='{$voucherNo}' ", "", true);
+        if ($Old["MRRNO"] != "") {
+            SQL_Delete("Actualsalsepayment where MRRNO = '{$Old["MRRNO"]}' ");
+        }
         SQL_InsertUpdate(
             $Entity = "Actualsalsepayment",
             $TheEntityNameData = array(
@@ -97,8 +103,9 @@ if ($ErrorUserInput["_Error"]) {
                 "ProjectID" => $_POST["ProjectID"],
                 "ProjectName" => GetProjectName($_POST["ProjectID"]),
 
-                "CustomerID" => $SaleX["CustomerID"],
-                "CustomerName" => GetCustomerName($SaleX["CustomerID"]),
+                "CustomerID" => $_POST["CustomerID"],
+                "CustomerName" => GetCustomerName($_POST["CustomerID"]),
+
                 "SalesID" => $_REQUEST["SaleID"],
                 "Term" => $_POST["Title"],
                 "ReceiveAmount" => $_POST["Amount"],
@@ -113,6 +120,7 @@ if ($ErrorUserInput["_Error"]) {
 
                 "ActualSalsePaymentIsActive" => $_REQUEST["ActualSalsePaymentIsActive"],
             )
+
         );
     }
     //ac
@@ -265,18 +273,18 @@ Sunset
         SQL_Delete("transaction where VoucherNo = '{$voucherNo}' and VoucherType ='CV' ");
         SQL_Delete("Actualsalsepayment where MRRNO = '{$voucherNo}'");
     }
-    print_r($_POST["CrVoucherIsDisplay"]);
+    // print_r($_POST["CrVoucherIsDisplay"]);
 
 
 
     $MainContent .= "
-	        " . CTL_Window($Title = "Application Setting Management", "The operation complete successfully and<br>
-			<br>
-			The $EntityCaptionLower information has been stored.<br>
-			<br>
-			Please click <a href=\"" . ApplicationURL("{$_REQUEST["Base"]}", "Manage") . "\">here</a> to proceed.", 300) . "
-	        <script language=\"JavaScript\" >
-	           window.location='" . ApplicationURL("{$_REQUEST["Base"]}", "Manage") . "';
-	        </script>
-		";
+            " . CTL_Window($Title = "Application Setting Management", "The operation complete successfully and<br>
+    		<br>
+    		The $EntityCaptionLower information has been stored.<br>
+    		<br>
+    		Please click <a href=\"" . ApplicationURL("{$_REQUEST["Base"]}", "Manage") . "\">here</a> to proceed.", 300) . "
+            <script language=\"JavaScript\" >
+               window.location='" . ApplicationURL("{$_REQUEST["Base"]}", "Manage") . "';
+            </script>
+    	";
 }
